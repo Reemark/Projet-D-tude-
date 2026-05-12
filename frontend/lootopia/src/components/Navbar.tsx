@@ -7,14 +7,15 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-indigo-600 text-white px-4 py-3 md:px-6 md:py-4">
-      <div className="flex justify-between items-center">
-        <Link to="/" className="text-xl font-bold">🗺️ Lootopia</Link>
+    <nav className="bg-[#0f172a]/95 backdrop-blur-md border-b border-emerald-900/30 px-4 py-3 md:px-6 md:py-4 sticky top-0 z-50">
+      <div className="max-w-6xl mx-auto flex justify-between items-center">
+        <Link to="/" className="text-xl font-bold text-emerald-400 hover:text-emerald-300 transition">
+          🗺️ Lootopia
+        </Link>
 
-        {/* Bouton hamburger mobile */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden p-2 rounded hover:bg-indigo-700"
+          className="md:hidden p-2 rounded hover:bg-slate-800 text-slate-300"
           aria-label="Menu"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -26,15 +27,13 @@ export default function Navbar() {
           </svg>
         </button>
 
-        {/* Navigation desktop */}
-        <div className="hidden md:flex gap-4 items-center">
+        <div className="hidden md:flex gap-1 items-center">
           <NavLinks user={user} isAuthenticated={isAuthenticated} logout={logout} />
         </div>
       </div>
 
-      {/* Navigation mobile */}
       {menuOpen && (
-        <div className="md:hidden mt-3 pt-3 border-t border-indigo-500 flex flex-col gap-3">
+        <div className="md:hidden mt-3 pt-3 border-t border-slate-700 flex flex-col gap-1 max-w-6xl mx-auto">
           <NavLinks user={user} isAuthenticated={isAuthenticated} logout={logout} mobile onNavigate={() => setMenuOpen(false)} />
         </div>
       )}
@@ -52,17 +51,17 @@ interface NavLinksProps {
 
 function NavLinks({ user, isAuthenticated, logout, mobile, onNavigate }: NavLinksProps) {
   const linkClass = mobile
-    ? "block py-2 px-3 rounded hover:bg-indigo-700 transition"
-    : "hover:underline";
+    ? "block py-2.5 px-4 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-emerald-400 transition"
+    : "px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-emerald-400 transition text-sm";
 
   return (
     <>
-      <Link to="/hunts" className={linkClass} onClick={onNavigate}>Chasses</Link>
-      <Link to="/leaderboard" className={linkClass} onClick={onNavigate}>Classement</Link>
+      <Link to="/hunts" className={linkClass} onClick={onNavigate}>🗺️ Chasses</Link>
+      <Link to="/leaderboard" className={linkClass} onClick={onNavigate}>🏆 Classement</Link>
       {isAuthenticated ? (
         <>
           {(user?.role === 'PARTNER' || user?.role === 'ADMIN') && (
-            <Link to="/partner/hunts" className={linkClass} onClick={onNavigate}>Mes chasses</Link>
+            <Link to="/partner/hunts" className={linkClass} onClick={onNavigate}>🎯 Mes chasses</Link>
           )}
           <Link to="/profile" className={linkClass} onClick={onNavigate}>
             👤 {user?.pseudo}
@@ -70,8 +69,8 @@ function NavLinks({ user, isAuthenticated, logout, mobile, onNavigate }: NavLink
           <button
             onClick={() => { logout(); onNavigate?.(); }}
             className={mobile
-              ? "text-left py-2 px-3 rounded bg-red-500/20 hover:bg-red-500/40 transition"
-              : "bg-red-500 px-3 py-1 rounded hover:bg-red-600"}
+              ? "text-left py-2.5 px-4 rounded-lg text-red-400 hover:bg-red-950/50 transition"
+              : "px-3 py-2 rounded-lg text-red-400 hover:bg-red-950/50 transition text-sm"}
           >
             Déconnexion
           </button>
@@ -82,8 +81,8 @@ function NavLinks({ user, isAuthenticated, logout, mobile, onNavigate }: NavLink
           <Link
             to="/register"
             className={mobile
-              ? "block py-2 px-3 rounded bg-white text-indigo-600 font-medium text-center"
-              : "bg-white text-indigo-600 px-3 py-1 rounded font-medium"}
+              ? "block py-2.5 px-4 rounded-lg bg-emerald-600 text-white font-medium text-center hover:bg-emerald-500 transition"
+              : "px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium text-sm hover:bg-emerald-500 transition"}
             onClick={onNavigate}
           >
             Inscription

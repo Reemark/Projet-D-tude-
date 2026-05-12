@@ -60,14 +60,14 @@ export default function HuntDetail() {
         setJoined(true);
         if (participation.status === 'FINISHED') setFinished(true);
       }
-    } catch { /* pas connecté ou erreur */ }
+    } catch {}
   };
 
   const loadProgress = async () => {
     try {
       const res = await api.get(`/progress/hunt/${id}`);
       setProgress(res.data);
-    } catch { /* pas encore de progression */ }
+    } catch {}
   };
 
   const isStepCompleted = (stepId: number) =>
@@ -88,7 +88,6 @@ export default function HuntDetail() {
       await api.post(`/progress/dig/${stepId}`);
       setMessage('Étape complétée ! 🎉');
       await loadProgress();
-      // Vérifier si toutes les étapes sont complétées
       const updatedProgress = [...progress, { stepId, completed: true }];
       if (steps.length > 0 && updatedProgress.filter(p => p.completed).length >= steps.length) {
         setFinished(true);
@@ -99,92 +98,114 @@ export default function HuntDetail() {
     }
   };
 
-  if (!hunt) return <p className="p-6">Chargement...</p>;
+  if (!hunt) return (
+    <div className="flex items-center justify-center min-h-[50vh]">
+      <div className="animate-spin h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full"></div>
+    </div>
+  );
 
   const completedCount = progress.filter(p => p.completed).length;
+  const difficultyStyle = hunt.difficulty === 'EASY'
+    ? 'text-emerald-400' : hunt.difficulty === 'MEDIUM'
+    ? 'text-amber-400' : 'text-red-400';
 
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-6">
-      <h1 className="text-2xl md:text-3xl font-bold">{hunt.title}</h1>
-      <p className="text-gray-600 mt-2">{hunt.description}</p>
-      <p className="text-sm text-gray-400 mt-1">Difficulté : {hunt.difficulty} • Par {hunt.creatorPseudo}</p>
+    <div className="max-w-4xl mx-auto p-4 md:p-8">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl md:text-4xl font-bold text-white">{hunt.title}</h1>
+        <p className="text-slate-400 mt-2">{hunt.description}</p>
+        <div className="flex gap-3 mt-3 text-sm">
+          <span className={`font-medium ${difficultyStyle}`}>{hunt.difficulty}</span>
+          <span className="text-slate-500">•</span>
+          <span className="text-slate-500">Par {hunt.creatorPseudo}</span>
+        </div>
+      </div>
 
+      {/* Message */}
       {message && (
-        <div className={`mt-4 p-3 rounded ${finished ? 'bg-yellow-50 text-yellow-800 border border-yellow-200' : 'bg-indigo-50 text-indigo-700'}`}>
+        <div className={`mb-6 p-4 rounded-xl border ${finished ? 'bg-amber-500/10 border-amber-500/30 text-amber-300' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'}`}>
           {message}
         </div>
       )}
 
-      {/* Bannière de victoire */}
+      {/* Victoire */}
       {finished && (
-        <div className="mt-4 p-4 bg-gradient-to-r from-yellow-100 to-amber-100 border border-yellow-300 rounded-lg text-center">
-          <p className="text-2xl mb-1">🏆</p>
-          <p className="font-bold text-yellow-800">Chasse terminée !</p>
-          <p className="text-sm text-yellow-700">Vous avez complété toutes les étapes. Bravo !</p>
+        <div className="mb-6 p-6 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/30 rounded-xl text-center">
+          <p className="text-4xl mb-2">🏆</p>
+          <p className="font-bold text-amber-300 text-lg">Chasse terminée !</p>
+          <p className="text-sm text-amber-400/70">Toutes les étapes ont été complétées. Bravo !</p>
         </div>
       )}
 
-      {/* Barre de progression */}
+      {/* Progression */}
       {joined && steps.length > 0 && (
-        <div className="mt-4">
-          <div className="flex justify-between text-sm text-gray-600 mb-1">
-            <span>Progression</span>
-            <span>{completedCount}/{steps.length} étapes</span>
+        <div className="mb-6 bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+          <div className="flex justify-between text-sm mb-2">
+            <span className="text-slate-400">Progression</span>
+            <span className="text-emerald-400 font-medium">{completedCount}/{steps.length}</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3">
+          <div className="w-full bg-slate-700 rounded-full h-2.5">
             <div
-              className={`h-3 rounded-full transition-all duration-500 ${finished ? 'bg-yellow-500' : 'bg-indigo-600'}`}
+              className={`h-2.5 rounded-full transition-all duration-700 ${finished ? 'bg-gradient-to-r from-amber-500 to-yellow-400' : 'bg-gradient-to-r from-emerald-600 to-emerald-400'}`}
               style={{ width: `${(completedCount / steps.length) * 100}%` }}
             />
           </div>
         </div>
       )}
 
+      {/* Rejoindre */}
       {isAuthenticated && !joined && (
         <button onClick={handleJoin}
-          className="mt-4 w-full md:w-auto bg-indigo-600 text-white px-6 py-3 md:py-2 rounded hover:bg-indigo-700 active:scale-[0.98] transition">
-          Rejoindre cette chasse
+          className="mb-6 w-full md:w-auto bg-emerald-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-emerald-500 active:scale-[0.98] transition shadow-lg shadow-emerald-500/20">
+          🎯 Rejoindre cette chasse
         </button>
       )}
 
-      <h2 className="text-lg md:text-xl font-semibold mt-8 mb-4">📍 Carte des étapes</h2>
-      {steps.length > 0 ? (
-        <HuntMap steps={steps} />
-      ) : (
-        <p className="text-gray-500">Aucune étape pour cette chasse.</p>
-      )}
+      {/* Carte */}
+      <div className="mb-8">
+        <h2 className="text-lg font-semibold text-white mb-4">📍 Carte des étapes</h2>
+        {steps.length > 0 ? (
+          <div className="rounded-xl overflow-hidden border border-slate-700/50">
+            <HuntMap steps={steps} />
+          </div>
+        ) : (
+          <p className="text-slate-500">Aucune étape pour cette chasse.</p>
+        )}
+      </div>
 
-      <h2 className="text-lg md:text-xl font-semibold mt-8 mb-4">📋 Étapes</h2>
+      {/* Étapes */}
+      <h2 className="text-lg font-semibold text-white mb-4">📋 Étapes</h2>
       <div className="space-y-3">
         {steps.map((step) => {
           const completed = isStepCompleted(step.id);
           return (
-            <div key={step.id} className={`border rounded-lg p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-3 transition ${completed ? 'bg-green-50 border-green-200' : ''}`}>
+            <div key={step.id} className={`border rounded-xl p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-3 transition-all ${completed ? 'bg-emerald-500/5 border-emerald-500/30' : 'bg-slate-800/50 border-slate-700/50 hover:border-slate-600'}`}>
               <div className="flex items-start gap-3">
-                <span className={`text-lg ${completed ? '✅' : '⬜'}`}>
+                <span className="text-xl mt-0.5">
                   {completed ? '✅' : '⬜'}
                 </span>
                 <div>
-                  <p className={`font-medium ${completed ? 'line-through text-gray-400' : ''}`}>
+                  <p className={`font-medium ${completed ? 'text-emerald-400' : 'text-white'}`}>
                     Étape {step.stepOrder}
                   </p>
-                  <p className="text-sm text-gray-600">{step.clue}</p>
-                  <p className="text-xs text-gray-400">{step.score} points • {step.arContent}</p>
+                  <p className="text-sm text-slate-400">{step.clue}</p>
+                  <p className="text-xs text-slate-500 mt-1">{step.score} pts • {step.arContent}</p>
                 </div>
               </div>
               <div className="flex gap-2">
                 <button onClick={() => setSelectedStep(step)}
-                  className="flex-1 md:flex-none text-sm bg-purple-100 text-purple-700 px-3 py-2 md:py-1 rounded hover:bg-purple-200 active:scale-[0.97] transition">
+                  className="flex-1 md:flex-none text-sm bg-purple-500/10 text-purple-400 border border-purple-500/30 px-4 py-2 rounded-lg hover:bg-purple-500/20 active:scale-[0.97] transition">
                   🔮 AR
                 </button>
                 {isAuthenticated && joined && !completed && (
                   <button onClick={() => handleDig(step.id)}
-                    className="flex-1 md:flex-none text-sm bg-green-100 text-green-700 px-3 py-2 md:py-1 rounded hover:bg-green-200 active:scale-[0.97] transition">
+                    className="flex-1 md:flex-none text-sm bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-4 py-2 rounded-lg hover:bg-emerald-500/20 active:scale-[0.97] transition">
                     ⛏️ Creuser
                   </button>
                 )}
                 {completed && (
-                  <span className="text-sm text-green-600 font-medium px-3 py-1">✓ Complété</span>
+                  <span className="text-sm text-emerald-500 font-medium px-3 py-2">✓ Complété</span>
                 )}
               </div>
             </div>
@@ -192,12 +213,15 @@ export default function HuntDetail() {
         })}
       </div>
 
+      {/* AR Viewer */}
       {selectedStep && (
-        <div className="mt-6">
-          <h2 className="text-lg md:text-xl font-semibold mb-4">🔮 Réalité Augmentée - Étape {selectedStep.stepOrder}</h2>
-          <ArViewer content={selectedStep.arContent} clue={selectedStep.clue} modelUrl={selectedStep.arModelUrl} />
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold text-white mb-4">🔮 Réalité Augmentée — Étape {selectedStep.stepOrder}</h2>
+          <div className="rounded-xl overflow-hidden border border-slate-700/50">
+            <ArViewer content={selectedStep.arContent} clue={selectedStep.clue} modelUrl={selectedStep.arModelUrl} />
+          </div>
           <button onClick={() => setSelectedStep(null)}
-            className="mt-3 w-full md:w-auto text-sm text-gray-500 border rounded px-4 py-2 hover:bg-gray-100 transition">
+            className="mt-3 w-full md:w-auto text-sm text-slate-400 border border-slate-700 rounded-lg px-4 py-2 hover:bg-slate-800 transition">
             Fermer la vue AR
           </button>
         </div>

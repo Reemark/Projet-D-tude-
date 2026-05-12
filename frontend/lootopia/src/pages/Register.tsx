@@ -48,68 +48,56 @@ export default function Register() {
     }
   };
 
+  const inputClass = "w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 mb-4 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition";
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <form onSubmit={handleSubmit} className="bg-white p-6 md:p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center mb-6">Inscription</h1>
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+    <div className="min-h-[80vh] flex items-center justify-center p-4">
+      <form onSubmit={handleSubmit} className="bg-slate-800/50 backdrop-blur border border-slate-700/50 p-6 md:p-8 rounded-2xl w-full max-w-md shadow-xl">
+        <div className="text-center mb-8">
+          <p className="text-4xl mb-2">⚔️</p>
+          <h1 className="text-2xl font-bold text-white">Inscription</h1>
+          <p className="text-slate-400 text-sm mt-1">Rejoignez l'aventure</p>
+        </div>
 
-        <input
-          type="text"
-          placeholder="Pseudo"
-          value={pseudo}
+        {error && (
+          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+            {error}
+          </div>
+        )}
+
+        <input type="text" placeholder="Pseudo" value={pseudo}
           onChange={(e) => setPseudo(e.target.value)}
-          className="w-full border rounded px-4 py-2 mb-4"
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
+          className={inputClass} required />
+        <input type="email" placeholder="Email" value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full border rounded px-4 py-2 mb-4"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Mot de passe (min 6 caractères)"
-          value={password}
+          className={inputClass} required />
+        <input type="password" placeholder="Mot de passe (min 6 caractères)" value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full border rounded px-4 py-2 mb-4"
-          required
-          minLength={6}
-        />
+          className={inputClass} required minLength={6} />
 
-        <label className="flex items-center gap-2 mb-4 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={isPartner}
+        <label className="flex items-center gap-3 mb-4 cursor-pointer select-none p-3 rounded-lg border border-slate-700 hover:border-emerald-500/50 transition">
+          <input type="checkbox" checked={isPartner}
             onChange={(e) => setIsPartner(e.target.checked)}
-            className="w-4 h-4 accent-indigo-600"
-          />
-          <span className="text-sm text-gray-700">Je suis un partenaire (organisateur de chasses)</span>
+            className="w-4 h-4 accent-emerald-500" />
+          <div>
+            <span className="text-sm text-slate-300">Je suis un partenaire</span>
+            <p className="text-xs text-slate-500">Organisateur de chasses au trésor</p>
+          </div>
         </label>
 
         {isPartner && (
-          <input
-            type="text"
-            placeholder="Numéro SIRET (14 chiffres)"
-            value={siret}
+          <input type="text" placeholder="Numéro SIRET (14 chiffres)" value={siret}
             onChange={(e) => setSiret(e.target.value.replace(/\D/g, '').slice(0, 14))}
-            className="w-full border rounded px-4 py-2 mb-4"
-            required
-            maxLength={14}
-            pattern="\d{14}"
-            title="Le SIRET doit contenir 14 chiffres"
-          />
+            className={inputClass} required maxLength={14} pattern="\d{14}"
+            title="Le SIRET doit contenir 14 chiffres" />
         )}
 
-        <button type="submit" className="w-full bg-indigo-600 text-white py-3 md:py-2 rounded hover:bg-indigo-700 active:scale-[0.98] transition text-base">
+        <button type="submit" className="w-full bg-emerald-600 text-white py-3 rounded-lg font-medium hover:bg-emerald-500 active:scale-[0.98] transition shadow-lg shadow-emerald-500/20">
           {isPartner ? "S'inscrire en tant que partenaire" : "S'inscrire"}
         </button>
 
-        <p className="text-center mt-4 text-sm">
-          Déjà un compte ? <Link to="/login" className="text-indigo-600 hover:underline">Se connecter</Link>
+        <p className="text-center mt-6 text-sm text-slate-400">
+          Déjà un compte ? <Link to="/login" className="text-emerald-400 hover:text-emerald-300 transition">Se connecter</Link>
         </p>
       </form>
     </div>
