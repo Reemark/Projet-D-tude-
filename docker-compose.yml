@@ -11,6 +11,34 @@ services:
       - "3306:3306"
     volumes:
       - lootopia-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    container_name: lootopia-backend
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:mysql://db:3306/lootopia
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      JWT_SECRET: dW5jaGFydGVkLWxvb3RvcGlhLXNlY3JldC1rZXktMjAyNS1zdXBlci1zZWN1cmU=
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+    depends_on:
+      db:
+        condition: service_healthy
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: lootopia-mail
+    ports:
+      - "1025:1025"
+      - "8025:8025"
 
 volumes:
   lootopia-data:

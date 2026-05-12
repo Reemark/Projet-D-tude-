@@ -2,6 +2,8 @@ package uncharted.demo.service;
 
 import org.springframework.stereotype.Service;
 import uncharted.demo.dto.UserProgressDto;
+import uncharted.demo.exception.BadRequestException;
+import uncharted.demo.exception.NotFoundException;
 import uncharted.demo.model.*;
 import uncharted.demo.repository.*;
 
@@ -28,13 +30,12 @@ public class UserProgressService {
 
     public UserProgressDto.Response dig(Integer stepId, String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+                .orElseThrow(() -> new NotFoundException("Utilisateur non trouvé"));
         Step step = stepRepository.findById(stepId)
-                .orElseThrow(() -> new RuntimeException("Étape non trouvée"));
+                .orElseThrow(() -> new NotFoundException("Étape non trouvée"));
 
-        // Vérifier que l'utilisateur participe à cette chasse
         if (!participationRepository.existsByUserIdAndHuntId(user.getId(), step.getHunt().getId())) {
-            throw new RuntimeException("Vous ne participez pas à cette chasse");
+            throw new BadRequestException("Vous ne participez pas à cette chasse");
         }
 
         UserProgress progress = userProgressRepository.findByUserIdAndStepId(user.getId(), stepId)
@@ -46,13 +47,17 @@ public class UserProgressService {
                     return p;
                 });
 
+        if (progress.isCompleted()) {
+            throw new BadRequestException("Étape déjà complétée");
+        }
+
         progress.setCompleted(true);
         progress.setCompletedAt(LocalDateTime.now());
         progress = userProgressRepository.save(progress);
 
-        // Mettre à jour le score de la participation
         Participation participation = participationRepository
-                .findByUserIdAndHuntId(user.getId(), step.getHunt().getId()).orElseThrow();
+                .findByUserIdAndHuntId(user.getId(), step.getHunt().getId())
+                .orElseThrow(() -> new NotFoundException("Participation non trouvée"));
         participation.setScore(participation.getScore() + step.getScore());
         participationRepository.save(participation);
 
@@ -61,7 +66,7 @@ public class UserProgressService {
 
     public List<UserProgressDto.Response> getProgress(Integer huntId, String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+                .orElseThrow(() -> new NotFoundException("Utilisateur non trouvé"));
         return userProgressRepository.findByUserIdAndHuntId(user.getId(), huntId)
                 .stream().map(this::toResponse).toList();
     }

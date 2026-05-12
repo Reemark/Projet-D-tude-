@@ -6,25 +6,41 @@ import uncharted.demo.exception.NotFoundException;
 import uncharted.demo.model.User;
 import uncharted.demo.repository.UserRepository;
 
+import java.util.List;
+
 @Service
-public class UserService {
+public class AdminService {
 
     private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    public AdminService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public UserDto.Response getProfile(String email) {
-        User user = userRepository.findByEmail(email)
+    public List<UserDto.Response> getAllUsers() {
+        return userRepository.findAll().stream().map(this::toResponse).toList();
+    }
+
+    public UserDto.Response deactivateUser(Integer userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Utilisateur non trouvé"));
+        user.setActive(false);
+        user = userRepository.save(user);
         return toResponse(user);
     }
 
-    public UserDto.Response updatePseudo(String email, String newPseudo) {
-        User user = userRepository.findByEmail(email)
+    public UserDto.Response activateUser(Integer userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Utilisateur non trouvé"));
-        user.setPseudo(newPseudo);
+        user.setActive(true);
+        user = userRepository.save(user);
+        return toResponse(user);
+    }
+
+    public UserDto.Response verifySiret(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Utilisateur non trouvé"));
+        user.setSiretVerified(true);
         user = userRepository.save(user);
         return toResponse(user);
     }

@@ -2,6 +2,8 @@ package uncharted.demo.service;
 
 import org.springframework.stereotype.Service;
 import uncharted.demo.dto.ParticipationDto;
+import uncharted.demo.exception.BadRequestException;
+import uncharted.demo.exception.NotFoundException;
 import uncharted.demo.model.Hunt;
 import uncharted.demo.model.Participation;
 import uncharted.demo.model.User;
@@ -27,12 +29,12 @@ public class ParticipationService {
 
     public ParticipationDto.Response join(Integer huntId, String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+                .orElseThrow(() -> new NotFoundException("Utilisateur non trouvé"));
         Hunt hunt = huntRepository.findById(huntId)
-                .orElseThrow(() -> new RuntimeException("Chasse non trouvée"));
+                .orElseThrow(() -> new NotFoundException("Chasse non trouvée"));
 
         if (participationRepository.existsByUserIdAndHuntId(user.getId(), huntId)) {
-            throw new RuntimeException("Déjà inscrit à cette chasse");
+            throw new BadRequestException("Déjà inscrit à cette chasse");
         }
 
         Participation participation = new Participation();
@@ -45,7 +47,7 @@ public class ParticipationService {
 
     public List<ParticipationDto.Response> getMyParticipations(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+                .orElseThrow(() -> new NotFoundException("Utilisateur non trouvé"));
         return participationRepository.findByUserId(user.getId())
                 .stream().map(this::toResponse).toList();
     }
