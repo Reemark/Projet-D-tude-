@@ -27,6 +27,9 @@ public class Step {
     @Column(columnDefinition = "TEXT")
     private String clue;
 
+    @Column(name = "ar_model_url")
+    private String arModelUrl;
+
     private int score;
 
     // --- GETTERS & SETTERS ---
@@ -85,6 +88,14 @@ public class Step {
 
     public void setClue(String clue) {
         this.clue = clue;
+    }
+
+    public String getArModelUrl() {
+        return arModelUrl;
+    }
+
+    public void setArModelUrl(String arModelUrl) {
+        this.arModelUrl = arModelUrl;
     }
 
     public int getScore() {

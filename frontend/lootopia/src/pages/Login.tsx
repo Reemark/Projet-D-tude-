@@ -21,8 +21,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <form onSubmit={handleSubmit} className="bg-white p-6 md:p-8 rounded-lg shadow-md w-full max-w-md">
         <h1 className="text-2xl font-bold text-center mb-6">Connexion</h1>
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
         <input
@@ -30,7 +30,7 @@ export default function Login() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full border rounded px-4 py-2 mb-4"
+          className="w-full border rounded px-4 py-3 md:py-2 mb-4 text-base"
           required
         />
         <input
@@ -38,10 +38,10 @@ export default function Login() {
           placeholder="Mot de passe"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full border rounded px-4 py-2 mb-6"
+          className="w-full border rounded px-4 py-3 md:py-2 mb-6 text-base"
           required
         />
-        <button type="submit" className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700">
+        <button type="submit" className="w-full bg-indigo-600 text-white py-3 md:py-2 rounded hover:bg-indigo-700 active:scale-[0.98] transition text-base">
           Se connecter
         </button>
         <p className="text-center mt-4 text-sm">

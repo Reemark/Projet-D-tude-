@@ -12,6 +12,7 @@ public class StepDto {
             @NotNull Double longitude,
             ArContent arContent,
             String clue,
+            String arModelUrl,
             int score
     ) {}
 
@@ -23,6 +24,7 @@ public class StepDto {
             double longitude,
             ArContent arContent,
             String clue,
+            String arModelUrl,
             int score
     ) {}
 }

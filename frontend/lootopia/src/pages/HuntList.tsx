@@ -25,22 +25,22 @@ export default function HuntList() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">🗺️ Chasses au trésor</h1>
+    <div className="max-w-4xl mx-auto p-4 md:p-6">
+      <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6">🗺️ Chasses au trésor</h1>
       {hunts.length === 0 ? (
         <p className="text-gray-500">Aucune chasse disponible pour le moment.</p>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
           {hunts.map((hunt) => (
             <Link key={hunt.id} to={`/hunts/${hunt.id}`}
-              className="block border rounded-lg p-4 hover:shadow-lg transition">
+              className="block border rounded-lg p-4 hover:shadow-lg transition active:scale-[0.98]">
               <div className="flex justify-between items-start">
-                <h2 className="text-lg font-semibold">{hunt.title}</h2>
+                <h2 className="text-base md:text-lg font-semibold">{hunt.title}</h2>
                 <span className={`text-xs px-2 py-1 rounded ${difficultyColor(hunt.difficulty)}`}>
                   {hunt.difficulty}
                 </span>
               </div>
-              <p className="text-gray-600 text-sm mt-2">{hunt.description}</p>
+              <p className="text-gray-600 text-sm mt-2 line-clamp-2">{hunt.description}</p>
               <p className="text-xs text-gray-400 mt-3">Par {hunt.creatorPseudo}</p>
             </Link>
           ))}
