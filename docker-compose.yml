@@ -33,6 +33,14 @@ services:
       db:
         condition: service_healthy
 
+  frontend:
+    build: ./frontend/lootopia
+    container_name: lootopia-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
   mailhog:
     image: mailhog/mailhog
     container_name: lootopia-mail
