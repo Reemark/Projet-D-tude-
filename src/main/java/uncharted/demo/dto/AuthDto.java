@@ -12,6 +12,13 @@ public class AuthDto {
             @NotBlank String pseudo
     ) {}
 
+    public record RegisterPartnerRequest(
+            @NotBlank @Email String email,
+            @NotBlank @Size(min = 6) String password,
+            @NotBlank String pseudo,
+            @NotBlank @Size(min = 14, max = 14) String siret
+    ) {}
+
     public record LoginRequest(
             @NotBlank @Email String email,
             @NotBlank String password
