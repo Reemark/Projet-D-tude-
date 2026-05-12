@@ -2,6 +2,7 @@ package uncharted.demo.service;
 
 import org.springframework.stereotype.Service;
 import uncharted.demo.dto.StepDto;
+import uncharted.demo.exception.NotFoundException;
 import uncharted.demo.model.Hunt;
 import uncharted.demo.model.Step;
 import uncharted.demo.repository.HuntRepository;
@@ -22,7 +23,7 @@ public class StepService {
 
     public StepDto.Response create(StepDto.CreateRequest request) {
         Hunt hunt = huntRepository.findById(request.huntId())
-                .orElseThrow(() -> new RuntimeException("Chasse non trouvée"));
+                .orElseThrow(() -> new NotFoundException("Chasse non trouvée"));
 
         Step step = new Step();
         step.setHunt(hunt);
@@ -43,6 +44,9 @@ public class StepService {
     }
 
     public void delete(Integer id) {
+        if (!stepRepository.existsById(id)) {
+            throw new NotFoundException("Étape non trouvée");
+        }
         stepRepository.deleteById(id);
     }
 

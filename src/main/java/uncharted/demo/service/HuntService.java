@@ -2,6 +2,8 @@ package uncharted.demo.service;
 
 import org.springframework.stereotype.Service;
 import uncharted.demo.dto.HuntDto;
+import uncharted.demo.exception.ForbiddenException;
+import uncharted.demo.exception.NotFoundException;
 import uncharted.demo.model.Hunt;
 import uncharted.demo.model.User;
 import uncharted.demo.repository.HuntRepository;
@@ -22,7 +24,7 @@ public class HuntService {
 
     public HuntDto.Response create(HuntDto.CreateRequest request, String creatorEmail) {
         User creator = userRepository.findByEmail(creatorEmail)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+                .orElseThrow(() -> new NotFoundException("Utilisateur non trouvé"));
 
         Hunt hunt = new Hunt();
         hunt.setTitle(request.title());
@@ -40,21 +42,21 @@ public class HuntService {
 
     public HuntDto.Response getById(Integer id) {
         Hunt hunt = huntRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Chasse non trouvée"));
+                .orElseThrow(() -> new NotFoundException("Chasse non trouvée"));
         return toResponse(hunt);
     }
 
     public List<HuntDto.Response> getByCreator(String email) {
         User creator = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+                .orElseThrow(() -> new NotFoundException("Utilisateur non trouvé"));
         return huntRepository.findByCreator(creator).stream().map(this::toResponse).toList();
     }
 
     public void delete(Integer id, String email) {
         Hunt hunt = huntRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Chasse non trouvée"));
+                .orElseThrow(() -> new NotFoundException("Chasse non trouvée"));
         if (!hunt.getCreator().getEmail().equals(email)) {
-            throw new RuntimeException("Non autorisé");
+            throw new ForbiddenException("Non autorisé à supprimer cette chasse");
         }
         huntRepository.delete(hunt);
     }
