@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8
+    container_name: lootopia-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: lootopia
+    ports:
+      - "3306:3306"
+    volumes:
+      - lootopia-data:/var/lib/mysql
+
+volumes:
+  lootopia-data:
