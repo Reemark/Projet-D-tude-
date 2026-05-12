@@ -59,6 +59,15 @@ public class UserProgressService {
                 .findByUserIdAndHuntId(user.getId(), step.getHunt().getId())
                 .orElseThrow(() -> new NotFoundException("Participation non trouvée"));
         participation.setScore(participation.getScore() + step.getScore());
+
+        // Vérifier si toutes les étapes sont complétées
+        long totalSteps = stepRepository.findByHuntIdOrderByStepOrderAsc(step.getHunt().getId()).size();
+        long completedSteps = userProgressRepository.findByUserIdAndHuntId(user.getId(), step.getHunt().getId())
+                .stream().filter(UserProgress::isCompleted).count();
+        if (completedSteps >= totalSteps) {
+            participation.setStatus(Status.FINISHED);
+        }
+
         participationRepository.save(participation);
 
         return toResponse(progress);
