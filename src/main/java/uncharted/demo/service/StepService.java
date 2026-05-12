@@ -32,6 +32,7 @@ public class StepService {
         step.setLongitude(request.longitude());
         step.setArContent(request.arContent());
         step.setClue(request.clue());
+        step.setArModelUrl(request.arModelUrl());
         step.setScore(request.score());
         step = stepRepository.save(step);
 
@@ -59,6 +60,7 @@ public class StepService {
                 step.getLongitude(),
                 step.getArContent(),
                 step.getClue(),
+                step.getArModelUrl(),
                 step.getScore()
         );
     }

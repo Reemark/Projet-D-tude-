@@ -55,8 +55,8 @@ public class AuthService {
         if (userRepository.existsByEmail(request.email())) {
             throw new BadRequestException("Email déjà utilisé");
         }
-        if (request.siret() == null || request.siret().length() != 14) {
-            throw new BadRequestException("Le SIRET doit contenir 14 chiffres");
+        if (!SiretValidator.isValid(request.siret())) {
+            throw new BadRequestException("Numéro SIRET invalide");
         }
 
         User user = new User();
