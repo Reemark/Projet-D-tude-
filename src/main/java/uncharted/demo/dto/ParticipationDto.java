@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 
 public class ParticipationDto {
 
+    public record JoinRequest(String secretCode) {}
+
     public record Response(
             Integer id,
             Integer huntId,

@@ -50,7 +50,7 @@ class HuntServiceTest {
         when(userRepository.findByEmail("partner@test.com")).thenReturn(Optional.of(creator));
         when(huntRepository.save(any(Hunt.class))).thenReturn(hunt);
 
-        HuntDto.CreateRequest request = new HuntDto.CreateRequest("Test Hunt", "Desc", Difficulty.EASY);
+        HuntDto.CreateRequest request = new HuntDto.CreateRequest("Test Hunt", "Desc", Difficulty.EASY, null);
         HuntDto.Response response = huntService.create(request, "partner@test.com");
 
         assertEquals("Test Hunt", response.title());

@@ -6,6 +6,7 @@ interface Hunt {
   id: number;
   title: string;
   difficulty: string;
+  isPrivate: boolean;
   createdAt: string;
 }
 
@@ -24,6 +25,7 @@ export default function PartnerHunts() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [difficulty, setDifficulty] = useState('MEDIUM');
+  const [secretCode, setSecretCode] = useState('');
   const [message, setMessage] = useState('');
 
   const [selectedHuntId, setSelectedHuntId] = useState<number | null>(null);
@@ -47,8 +49,8 @@ export default function PartnerHunts() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post('/hunts', { title, description, difficulty });
-      setTitle(''); setDescription('');
+      await api.post('/hunts', { title, description, difficulty, secretCode: secretCode.trim() || null });
+      setTitle(''); setDescription(''); setSecretCode('');
       setMessage('Chasse créée !');
       loadHunts();
     } catch { setMessage('Erreur lors de la création'); }
@@ -118,11 +120,20 @@ export default function PartnerHunts() {
           onChange={(e) => setDescription(e.target.value)}
           className={`${inputClass} mb-3`} rows={3} />
         <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}
-          className={`w-full ${selectClass} mb-4`}>
+          className={`w-full ${selectClass} mb-3`}>
           <option value="EASY">🟢 Facile</option>
           <option value="MEDIUM">🟡 Moyen</option>
           <option value="HARD">🔴 Difficile</option>
         </select>
+        <div className="mb-4">
+          <label className="block text-sm text-slate-400 mb-1">
+            🔒 Code secret <span className="text-slate-500">(optionnel — laissez vide pour une chasse publique)</span>
+          </label>
+          <input type="text" placeholder="Ex: AVENTURE2025"
+            value={secretCode}
+            onChange={(e) => setSecretCode(e.target.value)}
+            className={inputClass} />
+        </div>
         <button type="submit" className="bg-emerald-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-emerald-500 active:scale-[0.98] transition shadow-lg shadow-emerald-500/20">
           Créer la chasse
         </button>
@@ -138,7 +149,12 @@ export default function PartnerHunts() {
                 onClick={() => setSelectedHuntId(hunt.id)}
                 className={`border rounded-xl p-4 flex justify-between items-center cursor-pointer transition-all ${selectedHuntId === hunt.id ? 'border-emerald-500/50 bg-emerald-500/5' : 'border-slate-700/50 bg-slate-800/50 hover:border-slate-600'}`}>
                 <div>
-                  <p className="font-medium text-white">{hunt.title}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-white">{hunt.title}</p>
+                    {hunt.isPrivate && (
+                      <span className="text-xs bg-amber-500/20 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded-full">🔒 Privée</span>
+                    )}
+                  </div>
                   <p className="text-xs text-slate-500">{hunt.difficulty}</p>
                 </div>
                 <button onClick={(e) => { e.stopPropagation(); handleDelete(hunt.id); }}

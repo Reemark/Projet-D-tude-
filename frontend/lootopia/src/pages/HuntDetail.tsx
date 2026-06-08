@@ -10,6 +10,7 @@ interface Hunt {
   title: string;
   description: string;
   difficulty: string;
+  isPrivate: boolean;
   creatorPseudo: string;
 }
 
@@ -39,6 +40,9 @@ export default function HuntDetail() {
   const [finished, setFinished] = useState(false);
   const [selectedStep, setSelectedStep] = useState<Step | null>(null);
   const [message, setMessage] = useState('');
+  const [showCodeModal, setShowCodeModal] = useState(false);
+  const [secretCodeInput, setSecretCodeInput] = useState('');
+  const [codeError, setCodeError] = useState('');
 
   useEffect(() => {
     api.get(`/hunts/${id}`).then((res) => setHunt(res.data));
@@ -73,13 +77,29 @@ export default function HuntDetail() {
   const isStepCompleted = (stepId: number) =>
     progress.some((p) => p.stepId === stepId && p.completed);
 
-  const handleJoin = async () => {
+  const handleJoin = async (secretCode?: string, fromModal = false) => {
     try {
-      await api.post(`/participations/join/${id}`);
+      await api.post(`/participations/join/${id}`, secretCode ? { secretCode } : null);
       setJoined(true);
+      setShowCodeModal(false);
+      setSecretCodeInput('');
+      setCodeError('');
       setMessage('Vous avez rejoint la chasse ! 🎯');
     } catch (err: any) {
-      setMessage(err.response?.data?.message || 'Erreur');
+      const msg = err.response?.data?.message || 'Erreur';
+      if (fromModal) {
+        setCodeError(msg);
+      } else {
+        setMessage(msg);
+      }
+    }
+  };
+
+  const handleJoinClick = () => {
+    if (hunt?.isPrivate) {
+      setShowCodeModal(true);
+    } else {
+      handleJoin();
     }
   };
 
@@ -156,10 +176,50 @@ export default function HuntDetail() {
 
       {/* Rejoindre */}
       {isAuthenticated && !joined && (
-        <button onClick={handleJoin}
-          className="mb-6 w-full md:w-auto bg-emerald-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-emerald-500 active:scale-[0.98] transition shadow-lg shadow-emerald-500/20">
-          🎯 Rejoindre cette chasse
-        </button>
+        <div className="mb-6 flex items-center gap-3">
+          <button onClick={handleJoinClick}
+            className="w-full md:w-auto bg-emerald-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-emerald-500 active:scale-[0.98] transition shadow-lg shadow-emerald-500/20">
+            {hunt?.isPrivate ? '🔒 Rejoindre (code requis)' : '🎯 Rejoindre cette chasse'}
+          </button>
+          {hunt?.isPrivate && (
+            <span className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-lg">Chasse privée</span>
+          )}
+        </div>
+      )}
+
+      {/* Modal code secret */}
+      {showCodeModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+            <p className="text-2xl text-center mb-2">🔒</p>
+            <h3 className="text-lg font-bold text-white text-center mb-1">Chasse privée</h3>
+            <p className="text-sm text-slate-400 text-center mb-5">Entrez le code secret pour rejoindre cette chasse.</p>
+            <input
+              type="text"
+              placeholder="Code secret…"
+              value={secretCodeInput}
+              onChange={(e) => { setSecretCodeInput(e.target.value); setCodeError(''); }}
+              onKeyDown={(e) => e.key === 'Enter' && handleJoin(secretCodeInput, true)}
+              className={`w-full bg-slate-900/50 border rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none transition mb-2 text-center tracking-widest uppercase ${codeError ? 'border-red-500/70 focus:border-red-500' : 'border-slate-700 focus:border-emerald-500'}`}
+              autoFocus
+            />
+            {codeError && (
+              <p className="text-red-400 text-sm text-center mb-3">⚠️ {codeError}</p>
+            )}
+            {!codeError && <div className="mb-2" />}
+            <div className="flex gap-3">
+              <button onClick={() => { setShowCodeModal(false); setSecretCodeInput(''); setCodeError(''); }}
+                className="flex-1 py-2.5 rounded-lg border border-slate-600 text-slate-400 hover:bg-slate-700 transition text-sm">
+                Annuler
+              </button>
+              <button onClick={() => handleJoin(secretCodeInput, true)}
+                disabled={!secretCodeInput.trim()}
+                className="flex-1 py-2.5 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed transition text-sm">
+                Rejoindre
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Carte */}
