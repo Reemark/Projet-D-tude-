@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Search, X, Lock, ChevronRight, Map } from 'lucide-react';
 import api from '../services/api';
 
 interface Hunt {
@@ -14,12 +15,22 @@ interface Hunt {
 
 const DIFFICULTIES = ['TOUS', 'EASY', 'MEDIUM', 'HARD'] as const;
 type DifficultyFilter = typeof DIFFICULTIES[number];
+const difficultyLabel: Record<string, string> = { TOUS: 'Tous', EASY: 'Facile', MEDIUM: 'Moyen', HARD: 'Difficile' };
 
-const difficultyLabel: Record<string, string> = {
-  TOUS: 'Tous',
-  EASY: 'Facile',
-  MEDIUM: 'Moyen',
-  HARD: 'Difficile',
+const difficultyStyle = (d: string) => {
+  if (d === 'EASY') return 'text-emerald-700 bg-emerald-50 border-emerald-200';
+  if (d === 'MEDIUM') return 'text-amber-700 bg-amber-50 border-amber-200';
+  return 'text-red-700 bg-red-50 border-red-200';
+};
+
+const filterButtonStyle = (d: DifficultyFilter, active: boolean) => {
+  if (active) {
+    if (d === 'TOUS') return 'bg-ink text-white border-ink';
+    if (d === 'EASY') return 'bg-emerald-600 text-white border-emerald-600';
+    if (d === 'MEDIUM') return 'bg-amber-500 text-white border-amber-500';
+    return 'bg-red-500 text-white border-red-500';
+  }
+  return 'bg-white text-stone-500 border-stone-200 hover:border-stone-400 hover:text-stone-700';
 };
 
 export default function HuntList() {
@@ -27,9 +38,7 @@ export default function HuntList() {
   const [search, setSearch] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('TOUS');
 
-  useEffect(() => {
-    api.get('/hunts').then((res) => setHunts(res.data));
-  }, []);
+  useEffect(() => { api.get('/hunts').then((res) => setHunts(res.data)); }, []);
 
   const filtered = hunts.filter((h) => {
     const matchesText =
@@ -40,115 +49,84 @@ export default function HuntList() {
     return matchesText && matchesDifficulty;
   });
 
-  const difficultyStyle = (d: string) => {
-    if (d === 'EASY') return 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
-    if (d === 'MEDIUM') return 'bg-amber-500/20 text-amber-400 border border-amber-500/30';
-    return 'bg-red-500/20 text-red-400 border border-red-500/30';
-  };
-
-  const filterButtonStyle = (d: DifficultyFilter) => {
-    const active = difficultyFilter === d;
-    if (d === 'TOUS') return active ? 'bg-slate-600 text-white border-slate-500' : 'bg-slate-800/50 text-slate-400 border-slate-700/50 hover:border-slate-500';
-    if (d === 'EASY') return active ? 'bg-emerald-500/30 text-emerald-300 border-emerald-500/60' : 'bg-slate-800/50 text-slate-400 border-slate-700/50 hover:border-emerald-500/40';
-    if (d === 'MEDIUM') return active ? 'bg-amber-500/30 text-amber-300 border-amber-500/60' : 'bg-slate-800/50 text-slate-400 border-slate-700/50 hover:border-amber-500/40';
-    return active ? 'bg-red-500/30 text-red-300 border-red-500/60' : 'bg-slate-800/50 text-slate-400 border-slate-700/50 hover:border-red-500/40';
-  };
-
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-white">
-          🗺️ Chasses au trésor
-        </h1>
-        <p className="text-slate-400 mt-2">Explorez, résolvez, conquérez.</p>
+    <div className="max-w-5xl mx-auto px-4 py-8 md:px-8 md:py-12">
+      <div className="mb-10" data-aos="fade-down">
+        <div className="flex items-center gap-3 mb-1">
+          <Map size={22} className="text-gold" />
+          <h1 className="text-3xl md:text-4xl font-bold text-ink font-display">Chasses au trésor</h1>
+        </div>
+        <p className="text-stone-400 ml-9 text-sm">Explorez, résolvez, conquérez.</p>
       </div>
 
-      {/* Barre de recherche + filtres */}
-      <div className="mb-6 flex flex-col sm:flex-row gap-3">
+      <div className="mb-7 flex flex-col sm:flex-row gap-3" data-aos="fade-up" data-aos-delay="100">
         <div className="relative flex-1">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🔍</span>
-          <input
-            type="text"
-            placeholder="Rechercher par titre, description, créateur…"
-            value={search}
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
+          <input type="text" placeholder="Titre, description, créateur…" value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:border-emerald-500/50 focus:bg-slate-800 transition"
-          />
+            className="w-full pl-10 pr-9 py-2.5 bg-white border border-stone-200 rounded-xl text-ink placeholder-stone-400 text-sm focus:outline-none focus:border-gold transition shadow-sm" />
           {search && (
-            <button
-              onClick={() => setSearch('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition text-xs"
-            >
-              ✕
+            <button onClick={() => setSearch('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition">
+              <X size={14} />
             </button>
           )}
         </div>
         <div className="flex gap-2 flex-wrap">
           {DIFFICULTIES.map((d) => (
-            <button
-              key={d}
-              onClick={() => setDifficultyFilter(d)}
-              className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all ${filterButtonStyle(d)}`}
-            >
+            <button key={d} onClick={() => setDifficultyFilter(d)}
+              className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all shadow-sm ${filterButtonStyle(d, difficultyFilter === d)}`}>
               {difficultyLabel[d]}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Résultats */}
       {filtered.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-5xl mb-4">{hunts.length === 0 ? '🏜️' : '🔎'}</p>
-          <p className="text-slate-400 text-lg">
-            {hunts.length === 0
-              ? 'Aucune chasse disponible pour le moment.'
-              : 'Aucune chasse ne correspond à ta recherche.'}
+        <div className="text-center py-20 border border-dashed border-stone-300 rounded-2xl bg-white/50">
+          <p className="text-4xl mb-4 opacity-20">◎</p>
+          <p className="text-stone-400">
+            {hunts.length === 0 ? 'Aucune chasse disponible pour le moment.' : 'Aucune chasse ne correspond à ta recherche.'}
           </p>
           {hunts.length > 0 && (
-            <button
-              onClick={() => { setSearch(''); setDifficultyFilter('TOUS'); }}
-              className="mt-4 text-sm text-emerald-400 hover:text-emerald-300 transition"
-            >
+            <button onClick={() => { setSearch(''); setDifficultyFilter('TOUS'); }}
+              className="mt-4 text-sm text-gold hover:text-gold-light transition">
               Réinitialiser les filtres
             </button>
           )}
         </div>
       ) : (
         <>
-          <p className="text-slate-500 text-sm mb-4">
-            {filtered.length} chasse{filtered.length > 1 ? 's' : ''} trouvée{filtered.length > 1 ? 's' : ''}
+          <p className="text-stone-400 text-xs mb-4 uppercase tracking-widest">
+            {filtered.length} chasse{filtered.length > 1 ? 's' : ''}
             {(search || difficultyFilter !== 'TOUS') && (
-              <button
-                onClick={() => { setSearch(''); setDifficultyFilter('TOUS'); }}
-                className="ml-3 text-emerald-500 hover:text-emerald-400 transition"
-              >
+              <button onClick={() => { setSearch(''); setDifficultyFilter('TOUS'); }}
+                className="ml-3 text-gold normal-case tracking-normal hover:text-gold-light transition">
                 Tout afficher
               </button>
             )}
           </p>
           <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((hunt) => (
+            {filtered.map((hunt, i) => (
               <Link key={hunt.id} to={`/hunts/${hunt.id}`}
-                className="group block bg-slate-800/50 backdrop-blur border border-slate-700/50 rounded-xl p-5 hover:border-emerald-500/50 hover:bg-slate-800/80 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/5">
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex items-center gap-2 flex-1 min-w-0 mr-2">
-                    <h2 className="text-lg font-semibold text-white group-hover:text-emerald-400 transition truncate">
+                data-aos="fade-up" data-aos-delay={String(i * 60)}
+                className="group bg-white border border-stone-200 rounded-xl p-5 hover:border-gold/50 hover:shadow-lg hover:shadow-gold/10 hover:-translate-y-1 hover:scale-[1.01] transition-all duration-300 flex flex-col shadow-sm">
+                <div className="flex justify-between items-start mb-3 gap-2">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <h2 className="text-base font-semibold text-ink group-hover:text-gold transition truncate font-display">
                       {hunt.title}
                     </h2>
-                    {hunt.isPrivate && (
-                      <span className="shrink-0 text-xs bg-amber-500/20 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded-full">🔒</span>
-                    )}
+                    {hunt.isPrivate && <Lock size={12} className="shrink-0 text-amber-500" />}
                   </div>
-                  <span className={`shrink-0 text-xs px-2 py-1 rounded-full font-medium ${difficultyStyle(hunt.difficulty)}`}>
-                    {hunt.difficulty}
+                  <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full border font-medium ${difficultyStyle(hunt.difficulty)}`}>
+                    {difficultyLabel[hunt.difficulty] || hunt.difficulty}
                   </span>
                 </div>
-                <p className="text-slate-400 text-sm line-clamp-2 mb-4">{hunt.description}</p>
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-slate-500">Par {hunt.creatorPseudo}</p>
-                  <span className="text-xs text-emerald-500 opacity-0 group-hover:opacity-100 transition">
-                    Voir →
+                <p className="text-stone-500 text-sm line-clamp-2 mb-4 flex-1">{hunt.description}</p>
+                <div className="flex items-center justify-between pt-3 border-t border-stone-100">
+                  <p className="text-xs text-stone-400">Par {hunt.creatorPseudo}</p>
+                  <span className="flex items-center gap-1 text-xs text-gold/60 group-hover:text-gold transition font-medium">
+                    Voir <ChevronRight size={12} />
                   </span>
                 </div>
               </Link>

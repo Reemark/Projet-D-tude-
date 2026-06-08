@@ -1,0 +1,38 @@
+.bg-conic-wrapper {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg-conic {
+  width: 300vmax;
+  height: 300vmax;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent       0deg,
+    transparent      20deg,
+    #f59e0b12        60deg,
+    #fbbf2428        90deg,
+    #f59e0b12       120deg,
+    transparent      160deg,
+    transparent      200deg,
+    #fbbf2418       240deg,
+    #f59e0b10       270deg,
+    transparent      310deg,
+    transparent      360deg
+  );
+  animation: spin-conic 20s linear infinite;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 65%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 65%);
+}
+
+@keyframes spin-conic {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}

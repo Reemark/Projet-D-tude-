@@ -1,94 +1,116 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Map, Trophy, User, LogOut, Menu, X, Target } from 'lucide-react';
 
 export default function Navbar() {
   const { user, logout, isAuthenticated } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+
+  const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
+
+  const linkClass = (path: string) =>
+    `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium tracking-wide transition-all duration-200 ${
+      isActive(path)
+        ? 'text-gold bg-gold-pale'
+        : 'text-stone-500 hover:text-gold hover:bg-gold-pale/60'
+    }`;
 
   return (
-    <nav className="bg-[#0f172a]/95 backdrop-blur-md border-b border-emerald-900/30 px-4 py-3 md:px-6 md:py-4 sticky top-0 z-50">
+    <nav className="bg-white/90 backdrop-blur-md border-b border-stone-200 px-4 py-3 md:px-8 sticky top-0 z-50 shadow-sm">
       <div className="max-w-6xl mx-auto flex justify-between items-center">
-        <Link to="/" className="text-xl font-bold text-emerald-400 hover:text-emerald-300 transition">
-          🗺️ Lootopia
+        <Link to="/" className="flex items-center gap-2 group">
+          <span className="text-xl font-bold text-gold font-display tracking-widest group-hover:text-gold-light transition-colors">
+            LOOTOPIA
+          </span>
         </Link>
 
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden p-2 rounded hover:bg-slate-800 text-slate-300"
+          className="md:hidden p-2 rounded-lg text-stone-500 hover:text-gold hover:bg-gold-pale/60 transition"
           aria-label="Menu"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {menuOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
+          {menuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
 
-        <div className="hidden md:flex gap-1 items-center">
-          <NavLinks user={user} isAuthenticated={isAuthenticated} logout={logout} />
+        <div className="hidden md:flex items-center gap-1">
+          <Link to="/hunts" className={linkClass('/hunts')}>
+            <Map size={15} /> Chasses
+          </Link>
+          <Link to="/leaderboard" className={linkClass('/leaderboard')}>
+            <Trophy size={15} /> Classement
+          </Link>
+          {isAuthenticated ? (
+            <>
+              {(user?.role === 'PARTNER' || user?.role === 'ADMIN') && (
+                <Link to="/partner/hunts" className={linkClass('/partner/hunts')}>
+                  <Target size={15} /> Mes chasses
+                </Link>
+              )}
+              <Link to="/profile" className={linkClass('/profile')}>
+                <User size={15} /> {user?.pseudo}
+              </Link>
+              <button
+                onClick={logout}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-stone-400 hover:text-red-500 hover:bg-red-50 transition-all ml-1"
+              >
+                <LogOut size={15} /> Déconnexion
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className={linkClass('/login')}>Connexion</Link>
+              <Link
+                to="/register"
+                className="ml-2 px-4 py-2 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-light transition-all shadow-sm"
+              >
+                S'inscrire
+              </Link>
+            </>
+          )}
         </div>
       </div>
 
       {menuOpen && (
-        <div className="md:hidden mt-3 pt-3 border-t border-slate-700 flex flex-col gap-1 max-w-6xl mx-auto">
-          <NavLinks user={user} isAuthenticated={isAuthenticated} logout={logout} mobile onNavigate={() => setMenuOpen(false)} />
+        <div className="md:hidden mt-3 pt-3 border-t border-stone-200 flex flex-col gap-1 max-w-6xl mx-auto pb-2">
+          <Link to="/hunts" className={linkClass('/hunts')} onClick={() => setMenuOpen(false)}>
+            <Map size={16} /> Chasses
+          </Link>
+          <Link to="/leaderboard" className={linkClass('/leaderboard')} onClick={() => setMenuOpen(false)}>
+            <Trophy size={16} /> Classement
+          </Link>
+          {isAuthenticated ? (
+            <>
+              {(user?.role === 'PARTNER' || user?.role === 'ADMIN') && (
+                <Link to="/partner/hunts" className={linkClass('/partner/hunts')} onClick={() => setMenuOpen(false)}>
+                  <Target size={16} /> Mes chasses
+                </Link>
+              )}
+              <Link to="/profile" className={linkClass('/profile')} onClick={() => setMenuOpen(false)}>
+                <User size={16} /> {user?.pseudo}
+              </Link>
+              <button
+                onClick={() => { logout(); setMenuOpen(false); }}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-red-500 hover:bg-red-50 transition text-left"
+              >
+                <LogOut size={16} /> Déconnexion
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className={linkClass('/login')} onClick={() => setMenuOpen(false)}>Connexion</Link>
+              <Link
+                to="/register"
+                className="mt-1 px-4 py-2.5 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-light transition text-center"
+                onClick={() => setMenuOpen(false)}
+              >
+                S'inscrire
+              </Link>
+            </>
+          )}
         </div>
       )}
     </nav>
-  );
-}
-
-interface NavLinksProps {
-  user: { pseudo: string; role: string } | null;
-  isAuthenticated: boolean;
-  logout: () => void;
-  mobile?: boolean;
-  onNavigate?: () => void;
-}
-
-function NavLinks({ user, isAuthenticated, logout, mobile, onNavigate }: NavLinksProps) {
-  const linkClass = mobile
-    ? "block py-2.5 px-4 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-emerald-400 transition"
-    : "px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-emerald-400 transition text-sm";
-
-  return (
-    <>
-      <Link to="/hunts" className={linkClass} onClick={onNavigate}>🗺️ Chasses</Link>
-      <Link to="/leaderboard" className={linkClass} onClick={onNavigate}>🏆 Classement</Link>
-      {isAuthenticated ? (
-        <>
-          {(user?.role === 'PARTNER' || user?.role === 'ADMIN') && (
-            <Link to="/partner/hunts" className={linkClass} onClick={onNavigate}>🎯 Mes chasses</Link>
-          )}
-          <Link to="/profile" className={linkClass} onClick={onNavigate}>
-            👤 {user?.pseudo}
-          </Link>
-          <button
-            onClick={() => { logout(); onNavigate?.(); }}
-            className={mobile
-              ? "text-left py-2.5 px-4 rounded-lg text-red-400 hover:bg-red-950/50 transition"
-              : "px-3 py-2 rounded-lg text-red-400 hover:bg-red-950/50 transition text-sm"}
-          >
-            Déconnexion
-          </button>
-        </>
-      ) : (
-        <>
-          <Link to="/login" className={linkClass} onClick={onNavigate}>Connexion</Link>
-          <Link
-            to="/register"
-            className={mobile
-              ? "block py-2.5 px-4 rounded-lg bg-emerald-600 text-white font-medium text-center hover:bg-emerald-500 transition"
-              : "px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium text-sm hover:bg-emerald-500 transition"}
-            onClick={onNavigate}
-          >
-            Inscription
-          </Link>
-        </>
-      )}
-    </>
   );
 }

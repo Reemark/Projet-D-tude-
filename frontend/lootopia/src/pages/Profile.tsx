@@ -1,96 +1,95 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { User, Star, CheckCircle2, Compass, ChevronRight, Clock } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 interface Participation {
-  id: number;
-  huntId: number;
-  huntTitle: string;
-  status: string;
-  score: number;
-  createdAt: string;
+  id: number; huntId: number; huntTitle: string;
+  status: string; score: number; createdAt: string;
 }
+
+const roleBadge = (role: string) => {
+  if (role === 'ADMIN') return 'bg-red-50 text-red-600 border border-red-200';
+  if (role === 'PARTNER') return 'bg-purple-50 text-purple-600 border border-purple-200';
+  return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+};
+const roleLabel = (role: string) => {
+  if (role === 'ADMIN') return 'Administrateur';
+  if (role === 'PARTNER') return 'Partenaire';
+  return 'Aventurier';
+};
 
 export default function Profile() {
   const { user } = useAuth();
   const [participations, setParticipations] = useState<Participation[]>([]);
-
-  useEffect(() => {
-    api.get('/participations/mine').then((res) => setParticipations(res.data));
-  }, []);
+  useEffect(() => { api.get('/participations/mine').then((res) => setParticipations(res.data)); }, []);
 
   const totalScore = participations.reduce((sum, p) => sum + p.score, 0);
   const finishedCount = participations.filter(p => p.status === 'FINISHED').length;
 
   return (
-    <div className="max-w-3xl mx-auto p-4 md:p-8">
-      {/* Profil card */}
-      <div className="bg-slate-800/50 backdrop-blur border border-slate-700/50 rounded-2xl p-6 mb-8">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-2xl">
-            👤
+    <div className="max-w-3xl mx-auto px-4 py-8 md:px-8 md:py-12">
+      <div className="bg-white border border-stone-200 rounded-2xl p-6 mb-8 shadow-sm" data-aos="fade-up">
+        <div className="flex items-center gap-5 mb-6">
+          <div className="w-16 h-16 rounded-2xl bg-gold-pale border border-gold/30 flex items-center justify-center">
+            <User size={28} className="text-gold" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">{user?.pseudo}</h1>
-            <p className="text-slate-400 text-sm">{user?.email}</p>
-            <span className={`inline-block mt-1 text-xs px-2 py-0.5 rounded-full font-medium ${
-              user?.role === 'PARTNER' ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' :
-              user?.role === 'ADMIN' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
-              'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-            }`}>
-              {user?.role}
+            <h1 className="text-2xl font-bold text-ink font-display">{user?.pseudo}</h1>
+            <p className="text-stone-400 text-sm mt-0.5">{user?.email}</p>
+            <span className={`inline-block mt-2 text-xs px-2.5 py-0.5 rounded-full font-medium ${roleBadge(user?.role || '')}`}>
+              {roleLabel(user?.role || '')}
             </span>
           </div>
         </div>
-
-        {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-slate-900/50 rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold text-emerald-400">{totalScore}</p>
-            <p className="text-xs text-slate-500">Points</p>
-          </div>
-          <div className="bg-slate-900/50 rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold text-amber-400">{finishedCount}</p>
-            <p className="text-xs text-slate-500">Terminées</p>
-          </div>
-          <div className="bg-slate-900/50 rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold text-purple-400">{participations.length}</p>
-            <p className="text-xs text-slate-500">Participations</p>
-          </div>
+          {[
+            { icon: <Star size={18} className="text-gold" />, value: totalScore, label: 'Points' },
+            { icon: <CheckCircle2 size={18} className="text-emerald-600" />, value: finishedCount, label: 'Terminées' },
+            { icon: <Compass size={18} className="text-purple-500" />, value: participations.length, label: 'Participations' },
+          ].map((stat) => (
+            <div key={stat.label} className="bg-parchment border border-stone-200 rounded-xl p-4 text-center">
+              <div className="flex justify-center mb-2">{stat.icon}</div>
+              <p className="text-2xl font-bold text-ink font-display">{stat.value}</p>
+              <p className="text-xs text-stone-400 mt-0.5">{stat.label}</p>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Participations */}
-      <h2 className="text-lg font-semibold text-white mb-4">🎮 Mes participations</h2>
+      <div className="flex items-center gap-2 mb-4">
+        <Compass size={16} className="text-gold" />
+        <h2 className="text-base font-semibold text-ink font-display">Mes participations</h2>
+      </div>
+
       {participations.length === 0 ? (
-        <div className="text-center py-12 bg-slate-800/30 rounded-xl border border-slate-700/50">
-          <p className="text-3xl mb-2">🏜️</p>
-          <p className="text-slate-400">Aucune participation pour le moment.</p>
-          <Link to="/hunts" className="inline-block mt-4 text-sm text-emerald-400 hover:text-emerald-300 transition">
-            Explorer les chasses →
+        <div className="text-center py-14 border border-dashed border-stone-300 rounded-2xl bg-white/60">
+          <Compass size={28} className="mx-auto mb-3 text-stone-300" />
+          <p className="text-stone-400 text-sm">Aucune participation pour le moment.</p>
+          <Link to="/hunts" className="inline-flex items-center gap-1 mt-4 text-sm text-gold hover:text-gold-light transition font-medium">
+            Explorer les chasses <ChevronRight size={14} />
           </Link>
         </div>
       ) : (
-        <div className="space-y-3">
-          {participations.map((p) => (
+        <div className="space-y-2">
+          {participations.map((p, i) => (
             <Link key={p.id} to={`/hunts/${p.huntId}`}
-              className="block bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 hover:border-emerald-500/30 transition-all group">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-medium text-white group-hover:text-emerald-400 transition">{p.huntTitle}</p>
-                  <span className={`inline-block mt-1 text-xs px-2 py-0.5 rounded-full ${
-                    p.status === 'FINISHED'
-                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                      : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                  }`}>
-                    {p.status === 'FINISHED' ? '✓ Terminée' : '⏳ En cours'}
-                  </span>
-                </div>
-                <div className="text-right">
-                  <p className="text-lg font-bold text-emerald-400">{p.score}</p>
-                  <p className="text-xs text-slate-500">pts</p>
-                </div>
+              data-aos="fade-up" data-aos-delay={String(i * 50)}
+              className="flex items-center justify-between p-4 bg-white border border-stone-200 rounded-xl hover:border-gold/40 hover:shadow-md hover:shadow-gold/10 hover:-translate-y-0.5 transition-all duration-200 group shadow-sm">
+              <div>
+                <p className="font-medium text-ink group-hover:text-gold transition text-sm">{p.huntTitle}</p>
+                <span className={`inline-flex items-center gap-1 mt-1.5 text-xs px-2 py-0.5 rounded-full border ${
+                  p.status === 'FINISHED'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : 'bg-amber-50 text-amber-700 border-amber-200'
+                }`}>
+                  {p.status === 'FINISHED' ? <><CheckCircle2 size={10} /> Terminée</> : <><Clock size={10} /> En cours</>}
+                </span>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-gold font-display">{p.score}</p>
+                <p className="text-xs text-stone-400">pts</p>
               </div>
             </Link>
           ))}
