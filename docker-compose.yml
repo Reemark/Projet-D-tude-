@@ -41,6 +41,18 @@ services:
     depends_on:
       - backend
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: lootopia-phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: root
+    depends_on:
+      db:
+        condition: service_healthy
+
   mailhog:
     image: mailhog/mailhog
     container_name: lootopia-mail

@@ -102,6 +102,7 @@ docker compose up --build
 | API Backend | http://localhost:8080 |
 | Swagger UI | http://localhost:8080/swagger-ui.html |
 | MailHog (mails) | http://localhost:8025 |
+| phpMyAdmin | http://localhost:8081 |
 | MySQL | localhost:3306 |
 
 ### Développement local (hot-reload)
@@ -268,6 +269,7 @@ Le pipeline GitHub Actions (`.github/workflows/ci.yml`) :
 | `frontend` | Node 20 (build) + Nginx | 80 | SPA React + reverse proxy |
 | `backend` | Eclipse Temurin 17 | 8080 | API Spring Boot |
 | `db` | MySQL 8 | 3306 | Base de données |
+| `phpmyadmin` | phpMyAdmin | 8081 | Interface web MySQL (admin/root) |
 | `mailhog` | MailHog | 8025 | Serveur mail de dev |
 
 ### Commandes utiles
@@ -285,9 +287,24 @@ docker compose down
 # Reset la BDD
 docker compose down -v && docker compose up --build -d
 
-# Accéder à MySQL
+# Accéder à MySQL (CLI)
 docker exec -it lootopia-db mysql -uroot -proot lootopia
+
+# Accéder à MySQL (interface web)
+# Ouvrir http://localhost:8081 — login: root / root
 ```
+
+### Compte admin par défaut
+
+Au premier démarrage, le backend crée automatiquement un compte administrateur :
+
+| Champ | Valeur |
+|-------|--------|
+| Email | `admin@lootopia.com` |
+| Mot de passe | `Admin1234!` |
+| Rôle | `ADMIN` |
+
+> Le compte n'est créé que s'il n'existe pas déjà (idempotent).
 
 ---
 
