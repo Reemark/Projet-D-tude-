@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
+import BackgroundOrbs from './components/BackgroundOrbs';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import HuntList from './pages/HuntList';
@@ -14,7 +15,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <div className="min-h-screen">
+        <div className="min-h-screen relative">
+          <BackgroundOrbs />
+          <div className="relative z-10">
           <Navbar />
           <Routes>
             <Route path="/" element={<HuntList />} />
@@ -30,6 +33,7 @@ export default function App() {
               <ProtectedRoute><PartnerHunts /></ProtectedRoute>
             } />
           </Routes>
+          </div>
         </div>
       </AuthProvider>
     </BrowserRouter>

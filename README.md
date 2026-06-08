@@ -15,6 +15,7 @@ Lootopia est une plateforme de chasses au trésor interactives combinant **géol
 ### Joueurs
 - Inscription / connexion sécurisée (JWT)
 - Parcourir et rejoindre des chasses au trésor
+- Recherche textuelle + filtre par difficulté sur la liste des chasses
 - Carte interactive avec points de passage (Leaflet)
 - Action "Creuser" pour valider une étape
 - Visualisation AR des indices (modèles 3D, texte, images)
@@ -24,6 +25,7 @@ Lootopia est une plateforme de chasses au trésor interactives combinant **géol
 ### Partenaires
 - Inscription avec validation SIRET (algorithme de Luhn)
 - Création et gestion de chasses (CRUD)
+- Code secret optionnel pour rendre une chasse privée
 - Ajout d'étapes géolocalisées avec contenu AR
 - Choix de modèles 3D par défaut ou URL GLTF personnalisée
 
@@ -39,7 +41,7 @@ Lootopia est une plateforme de chasses au trésor interactives combinant **géol
 | Couche | Technologies |
 |--------|-------------|
 | **Backend** | Java 17, Spring Boot 3.4.3, Spring Security, Spring Data JPA |
-| **Frontend** | React 19, TypeScript, Vite 7, TailwindCSS v4 |
+| **Frontend** | React 19, TypeScript, Vite 7, TailwindCSS v4, Lucide React, AOS |
 | **Base de données** | MySQL 8 |
 | **Cartographie** | Leaflet + React-Leaflet (OpenStreetMap) |
 | **Réalité augmentée** | A-Frame + modèles GLTF |
@@ -140,9 +142,10 @@ Projet-D-tude-/
 ├── src/test/java/                   # Tests unitaires + intégration
 ├── frontend/lootopia/               # Frontend React
 │   ├── src/pages/                   # Pages (HuntList, HuntDetail, etc.)
-│   ├── src/components/              # Composants (Navbar, HuntMap, ArViewer)
+│   ├── src/components/              # Composants (Navbar, HuntMap, ArViewer, BackgroundOrbs)
 │   ├── src/context/                 # AuthContext (état global)
 │   ├── src/services/                # Client API (Axios)
+│   ├── src/index.css                # Thème global (tokens Tailwind, polices, animations)
 │   ├── Dockerfile                   # Build multi-stage + Nginx
 │   └── nginx.conf                   # Proxy /api + SPA fallback
 ├── docs/                            # Documentation projet
@@ -305,6 +308,23 @@ Au premier démarrage, le backend crée automatiquement un compte administrateur
 | Rôle | `ADMIN` |
 
 > Le compte n'est créé que s'il n'existe pas déjà (idempotent).
+
+---
+
+## Interface utilisateur
+
+### Thème visuel
+- Typographie : **Cinzel** (titres, display) + **Inter** (corps de texte) — Google Fonts
+- Palette : fond or pièce `#fffbeb`, accents **gold** `#b8860b`, texte encre `#1c1a16`
+- Tokens Tailwind v4 personnalisés : `text-gold`, `bg-gold`, `font-display`, `text-ink`, etc.
+
+### Animations
+- **AOS (Animate On Scroll)** : apparition des titres (`fade-down`), cartes (`fade-up` en cascade), lignes de classement (`fade-right`), formulaires (`fade-up`)
+- **Effets hover** : élévation (`-translate-y-1`), scale léger, shadow dorée sur toutes les cartes et liens
+- **Animation de fond** : dégradé conique rotatif (`conic-gradient`) couvrant toute la page — tourne en 20s, masqué aux bords par un `mask-image` radial
+
+### Icônes
+- **Lucide React** utilisé sur toutes les pages (Map, Trophy, Lock, Search, User, etc.)
 
 ---
 
