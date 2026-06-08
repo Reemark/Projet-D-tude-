@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, AlertCircle } from 'lucide-react';
+import compassLogo from '../assets/compass.svg';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -25,6 +26,7 @@ export default function Login() {
     <div className="min-h-[90vh] flex items-center justify-center p-4">
       <div className="w-full max-w-md" data-aos="fade-up">
         <div className="text-center mb-8">
+          <img src={compassLogo} alt="Lootopia" className="w-24 h-24 mx-auto mb-3 drop-shadow-lg" />
           <h1 className="text-4xl font-bold text-gold font-display tracking-wider mb-2">LOOTOPIA</h1>
           <p className="text-stone-400 text-sm italic">Reprenez votre aventure</p>
         </div>

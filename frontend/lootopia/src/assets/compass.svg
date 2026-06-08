@@ -1,0 +1,78 @@
+<svg width="100%" viewBox="0 0 680 680" role="img" xmlns="http://www.w3.org/2000/svg"><defs><mask id="imagine-text-gaps-8qcgtp" maskUnits="userSpaceOnUse"><rect x="0" y="0" width="680" height="680" fill="white"/><rect x="326.60626220703125" y="69.5999984741211" width="26.787500381469727" height="26.399999618530273" fill="black" rx="2"/><rect x="330.8062438964844" y="593.6000366210938" width="18.40000057220459" height="21.600000381469727" fill="black" rx="2"/><rect x="74.1875" y="329.6000061035156" width="28" height="21.600000381469727" fill="black" rx="2"/><rect x="582.2250366210938" y="329.6000061035156" width="20" height="21.600000381469727" fill="black" rx="2"/><rect x="402.38751220703125" y="125.5999984741211" width="25.23798942565918" height="16.800000190734863" fill="black" rx="2"/><rect x="407.3187561035156" y="535.6000366210938" width="22.17138671875" height="16.800000190734863" fill="black" rx="2"/><rect x="249.5437469482422" y="535.6000366210938" width="26.17138671875" height="16.800000190734863" fill="black" rx="2"/><rect x="247.6125030517578" y="125.5999984741211" width="29.23798942565918" height="16.800000190734863" fill="black" rx="2"/><rect x="331.3500061035156" y="142" width="17.52392578125" height="13.600000381469727" fill="black" rx="2"/><rect x="385.8625183105469" y="158" width="22.48974609375" height="13.600000381469727" fill="black" rx="2"/><rect x="428.8000183105469" y="192" width="22.6171875" height="13.600000381469727" fill="black" rx="2"/><rect x="446.8000183105469" y="245" width="22.6171875" height="13.600000381469727" fill="black" rx="2"/><rect x="431.8999938964844" y="300" width="26.41845703125" height="13.600000381469727" fill="black" rx="2"/><rect x="392.0375061035156" y="342" width="26.14599609375" height="13.600000381469727" fill="black" rx="2"/><rect x="326.73126220703125" y="360" width="26.7568359375" height="13.600000381469727" fill="black" rx="2"/><rect x="264.8999938964844" y="342" width="26.41845703125" height="13.600000381469727" fill="black" rx="2"/><rect x="224.2937469482422" y="300" width="27.6357421875" height="13.600000381469727" fill="black" rx="2"/><rect x="210.5749969482422" y="245" width="27.0732421875" height="13.600000381469727" fill="black" rx="2"/><rect x="224.10000610351562" y="190" width="28.013671875" height="13.600000381469727" fill="black" rx="2"/><rect x="269.3812561035156" y="157" width="27.45556640625" height="13.600000381469727" fill="black" rx="2"/><rect x="409.48126220703125" y="249.1999969482422" width="20.800000190734863" height="20" fill="black" rx="2"/><rect x="250.4187469482422" y="629.2000122070312" width="179.16250610351562" height="15.199999809265137" fill="black" rx="2"/></mask></defs>
+<circle cx="340" cy="340" r="290" fill="#2C1A0E" stroke="#8B6914" stroke-width="3"/>
+<circle cx="340" cy="340" r="280" fill="#1A0F07" stroke="#C8941A" stroke-width="1.5"/>
+<circle cx="340" cy="340" r="265" fill="none" stroke="#8B6914" stroke-width="0.5" stroke-dasharray="4,6"/>
+<circle cx="340" cy="340" r="250" fill="#3D2410" stroke="#C8941A" stroke-width="2"/>
+<circle cx="340" cy="340" r="240" fill="#2A1508" stroke="#8B6914" stroke-width="1"/>
+<g stroke="#6B4F1E" stroke-width="0.5" fill="none">
+  <line x1="340" y1="100" x2="340" y2="580" mask="url(#imagine-text-gaps-8qcgtp)"/>
+  <line x1="100" y1="340" x2="580" y2="340" mask="url(#imagine-text-gaps-8qcgtp)"/>
+  <line x1="170" y1="170" x2="510" y2="510"/>
+  <line x1="510" y1="170" x2="170" y2="510" mask="url(#imagine-text-gaps-8qcgtp)"/>
+  <line x1="340" y1="100" x2="510" y2="170" stroke-dasharray="2,4" mask="url(#imagine-text-gaps-8qcgtp)"/>
+  <line x1="510" y1="170" x2="580" y2="340" stroke-dasharray="2,4"/>
+  <line x1="580" y1="340" x2="510" y2="510" stroke-dasharray="2,4"/>
+  <line x1="510" y1="510" x2="340" y2="580" stroke-dasharray="2,4" mask="url(#imagine-text-gaps-8qcgtp)"/>
+  <line x1="340" y1="580" x2="170" y2="510" stroke-dasharray="2,4" mask="url(#imagine-text-gaps-8qcgtp)"/>
+  <line x1="170" y1="510" x2="100" y2="340" stroke-dasharray="2,4" mask="url(#imagine-text-gaps-8qcgtp)"/>
+  <line x1="100" y1="340" x2="170" y2="170" stroke-dasharray="2,4" mask="url(#imagine-text-gaps-8qcgtp)"/>
+  <line x1="170" y1="170" x2="340" y2="100" stroke-dasharray="2,4" mask="url(#imagine-text-gaps-8qcgtp)"/>
+</g>
+<polygon points="340,105 350,160 340,145 330,160" fill="#D4A017" stroke="#8B6914" stroke-width="1"/>
+<polygon points="340,575 350,520 340,535 330,520" fill="#C8941A" stroke="#8B6914" stroke-width="1"/>
+<polygon points="105,340 160,330 145,340 160,350" fill="#C8941A" stroke="#8B6914" stroke-width="1"/>
+<polygon points="575,340 520,350 535,340 520,330" fill="#C8941A" stroke="#8B6914" stroke-width="1"/>
+<polygon points="340,120 347,178 340,158 333,178" fill="#E8C547" stroke="#8B6914" stroke-width="0.5"/>
+<polygon points="340,560 347,502 340,522 333,502" fill="#A07820" stroke="#8B6914" stroke-width="0.5"/>
+<polygon points="120,340 178,333 158,340 178,347" fill="#A07820" stroke="#8B6914" stroke-width="0.5"/>
+<polygon points="560,340 502,347 522,340 502,333" fill="#A07820" stroke="#8B6914" stroke-width="0.5"/>
+<text x="340" y="90" text-anchor="middle" fill="#E8C547" font-size="20" font-weight="bold" letter-spacing="2" font-family="Georgia, serif">N</text>
+<text x="340" y="610" text-anchor="middle" fill="#C8941A" font-size="16" font-weight="bold" font-family="Georgia, serif">S</text>
+<text x="88" y="346" text-anchor="middle" fill="#C8941A" font-size="16" font-weight="bold" font-family="Georgia, serif">W</text>
+<text x="592" y="346" text-anchor="middle" fill="#C8941A" font-size="16" font-weight="bold" font-family="Georgia, serif">E</text>
+<text x="415" y="138" text-anchor="middle" fill="#8B6914" font-size="11" font-family="Georgia, serif">NE</text>
+<text x="418" y="548" text-anchor="middle" fill="#8B6914" font-size="11" font-family="Georgia, serif">SE</text>
+<text x="262" y="548" text-anchor="middle" fill="#8B6914" font-size="11" font-family="Georgia, serif">SW</text>
+<text x="262" y="138" text-anchor="middle" fill="#8B6914" font-size="11" font-family="Georgia, serif">NW</text>
+<polygon points="340,180 352,320 340,310 328,320" fill="#CC2200" stroke="#8B1000" stroke-width="1"/>
+<polygon points="340,180 352,320 340,330 328,320" fill="#AA1A00" stroke="#8B1000" stroke-width="0.5" opacity="0.6"/>
+<polygon points="340,500 352,360 340,370 328,360" fill="#E8E0D0" stroke="#8B8070" stroke-width="1"/>
+<polygon points="340,500 352,360 340,350 328,360" fill="#C8C0B0" stroke="#8B8070" stroke-width="0.5" opacity="0.6"/>
+<circle cx="340" cy="340" r="22" fill="#1A0F07" stroke="#C8941A" stroke-width="2"/>
+<circle cx="340" cy="340" r="14" fill="#C8941A" stroke="#8B6914" stroke-width="1"/>
+<circle cx="340" cy="340" r="7" fill="#E8C547" stroke="#8B6914" stroke-width="0.5"/>
+<circle cx="340" cy="340" r="3" fill="#1A0F07"/>
+<circle cx="340" cy="340" r="195" fill="none" stroke="#8B6914" stroke-width="1" stroke-dasharray="2,8"/>
+<g fill="#C8941A" font-size="9" text-anchor="middle" font-family="Georgia, serif">
+  <text x="340" y="152">0°</text>
+  <text x="397" y="168">30°</text>
+  <text x="440" y="202">60°</text>
+  <text x="458" y="255">90°</text>
+  <text x="445" y="310">120°</text>
+  <text x="405" y="352">150°</text>
+  <text x="340" y="370">180°</text>
+  <text x="278" y="352">210°</text>
+  <text x="238" y="310">240°</text>
+  <text x="224" y="255">270°</text>
+  <text x="238" y="200">300°</text>
+  <text x="283" y="167">330°</text>
+</g>
+<circle cx="420" cy="260" r="18" fill="#1A0F07" stroke="#C8941A" stroke-width="1" opacity="0.8"/>
+<text x="420" y="264" text-anchor="middle" fill="#E8C547" font-size="14" font-weight="bold" font-family="Georgia, serif">★</text>
+<path d="M 390 230 Q 410 220 420 242" fill="none" stroke="#8B6914" stroke-width="0.8" stroke-dasharray="3,3"/>
+<g stroke="#6B4F1E" stroke-width="0.5" fill="none">
+  <circle cx="340" cy="340" r="175"/>
+  <circle cx="340" cy="340" r="155"/>
+</g>
+<text x="340" y="640" text-anchor="middle" fill="#8B6914" font-size="10" letter-spacing="3" font-family="Georgia, serif">✦ TERRA INCOGNITA ✦</text>
+<circle cx="340" cy="340" r="290" fill="none" stroke="#C8941A" stroke-width="4"/>
+<circle cx="340" cy="340" r="284" fill="none" stroke="#8B6914" stroke-width="1"/>
+<g fill="#C8941A" opacity="0.4">
+  <circle cx="130" cy="160" r="2"/>
+  <circle cx="560" cy="180" r="1.5"/>
+  <circle cx="150" cy="520" r="2"/>
+  <circle cx="550" cy="510" r="1.5"/>
+  <circle cx="200" cy="100" r="1"/>
+  <circle cx="480" cy="580" r="1.5"/>
+</g>
+</svg>

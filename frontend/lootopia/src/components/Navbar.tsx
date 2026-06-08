@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Map, Trophy, User, LogOut, Menu, X, Target } from 'lucide-react';
+import compassLogo from '../assets/compass.svg';
 
 export default function Navbar() {
   const { user, logout, isAuthenticated } = useAuth();
@@ -21,6 +22,7 @@ export default function Navbar() {
     <nav className="bg-white/90 backdrop-blur-md border-b border-stone-200 px-4 py-3 md:px-8 sticky top-0 z-50 shadow-sm">
       <div className="max-w-6xl mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2 group">
+          <img src={compassLogo} alt="Lootopia" className="w-9 h-9 group-hover:rotate-12 transition-transform duration-500" />
           <span className="text-xl font-bold text-gold font-display tracking-widest group-hover:text-gold-light transition-colors">
             LOOTOPIA
           </span>
