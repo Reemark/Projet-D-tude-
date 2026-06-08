@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import uncharted.demo.dto.ParticipationDto;
 import uncharted.demo.service.ParticipationService;
 
+import java.util.Map;
+
 import java.util.List;
 
 @RestController
@@ -19,8 +21,12 @@ public class ParticipationController {
     }
 
     @PostMapping("/join/{huntId}")
-    public ResponseEntity<ParticipationDto.Response> join(@PathVariable Integer huntId, Authentication auth) {
-        return ResponseEntity.ok(participationService.join(huntId, auth.getName()));
+    public ResponseEntity<ParticipationDto.Response> join(
+            @PathVariable Integer huntId,
+            @RequestBody(required = false) ParticipationDto.JoinRequest body,
+            Authentication auth) {
+        String secretCode = body != null ? body.secretCode() : null;
+        return ResponseEntity.ok(participationService.join(huntId, auth.getName(), secretCode));
     }
 
     @GetMapping("/mine")

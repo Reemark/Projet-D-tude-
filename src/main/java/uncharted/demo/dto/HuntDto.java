@@ -11,7 +11,8 @@ public class HuntDto {
     public record CreateRequest(
             @NotBlank String title,
             String description,
-            @NotNull Difficulty difficulty
+            @NotNull Difficulty difficulty,
+            String secretCode
     ) {}
 
     public record Response(
@@ -21,6 +22,7 @@ public class HuntDto {
             Difficulty difficulty,
             String creatorPseudo,
             boolean isActive,
+            boolean isPrivate,
             LocalDateTime createdAt
     ) {}
 }

@@ -57,7 +57,7 @@ class ParticipationServiceTest {
         when(participationRepository.existsByUserIdAndHuntId(1, 1)).thenReturn(false);
         when(participationRepository.save(any())).thenReturn(participation);
 
-        ParticipationDto.Response response = participationService.join(1, "player@test.com");
+        ParticipationDto.Response response = participationService.join(1, "player@test.com", null);
 
         assertNotNull(response);
         assertEquals("Player", response.userPseudo());
@@ -76,7 +76,7 @@ class ParticipationServiceTest {
         when(huntRepository.findById(1)).thenReturn(Optional.of(hunt));
         when(participationRepository.existsByUserIdAndHuntId(1, 1)).thenReturn(true);
 
-        assertThrows(BadRequestException.class, () -> participationService.join(1, "player@test.com"));
+        assertThrows(BadRequestException.class, () -> participationService.join(1, "player@test.com", null));
     }
 
     @Test
@@ -88,6 +88,6 @@ class ParticipationServiceTest {
         when(userRepository.findByEmail("player@test.com")).thenReturn(Optional.of(user));
         when(huntRepository.findById(99)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> participationService.join(99, "player@test.com"));
+        assertThrows(NotFoundException.class, () -> participationService.join(99, "player@test.com", null));
     }
 }

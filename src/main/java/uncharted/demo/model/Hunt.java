@@ -26,7 +26,10 @@ public class Hunt {
     private User creator;
 
     @Column(name = "is_active")
-    private boolean isActive = true; 
+    private boolean isActive = true;
+
+    @Column(name = "secret_code")
+    private String secretCode;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -84,6 +87,14 @@ public class Hunt {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public String getSecretCode() {
+        return secretCode;
+    }
+
+    public void setSecretCode(String secretCode) {
+        this.secretCode = secretCode;
     }
 
     public LocalDateTime getCreatedAt() {

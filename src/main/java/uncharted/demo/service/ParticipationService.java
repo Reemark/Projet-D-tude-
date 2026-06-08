@@ -27,11 +27,17 @@ public class ParticipationService {
         this.huntRepository = huntRepository;
     }
 
-    public ParticipationDto.Response join(Integer huntId, String email) {
+    public ParticipationDto.Response join(Integer huntId, String email, String secretCode) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("Utilisateur non trouvé"));
         Hunt hunt = huntRepository.findById(huntId)
                 .orElseThrow(() -> new NotFoundException("Chasse non trouvée"));
+
+        if (hunt.getSecretCode() != null) {
+            if (secretCode == null || !hunt.getSecretCode().equals(secretCode.trim())) {
+                throw new BadRequestException("Code secret incorrect");
+            }
+        }
 
         if (participationRepository.existsByUserIdAndHuntId(user.getId(), huntId)) {
             throw new BadRequestException("Déjà inscrit à cette chasse");

@@ -31,6 +31,9 @@ public class HuntService {
         hunt.setDescription(request.description());
         hunt.setDifficulty(request.difficulty());
         hunt.setCreator(creator);
+        if (request.secretCode() != null && !request.secretCode().isBlank()) {
+            hunt.setSecretCode(request.secretCode().trim());
+        }
         hunt = huntRepository.save(hunt);
 
         return toResponse(hunt);
@@ -69,6 +72,7 @@ public class HuntService {
                 hunt.getDifficulty(),
                 hunt.getCreator().getPseudo(),
                 hunt.isActive(),
+                hunt.getSecretCode() != null,
                 hunt.getCreatedAt()
         );
     }
