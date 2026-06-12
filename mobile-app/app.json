@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "Lootopia",
+    "slug": "lootopia-mobile",
+    "version": "1.0.0",
+    "orientation": "default",
+    "scheme": "lootopia",
+    "userInterfaceStyle": "light",
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Lootopia a besoin de la caméra pour afficher les objets 3D en réalité augmentée.",
+          "microphonePermission": false
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Lootopia a besoin de votre localisation pour les chasses au trésor."
+        }
+      ]
+    ],
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#b8860b"
+      },
+      "package": "com.lootopia.mobile"
+    },
+    "ios": {
+      "bundleIdentifier": "com.lootopia.mobile",
+      "supportsTablet": true
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
