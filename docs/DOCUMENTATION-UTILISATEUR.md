@@ -83,9 +83,23 @@ Certaines chasses sont protégées par un **code secret** (indiqué par une icô
 
 ### Creuser (valider une étape)
 
-1. Sur la page de détail, trouvez l'étape à valider
+Les étapes doivent être complétées **dans l'ordre**. Vous ne pouvez pas valider l'étape 2 avant d'avoir validé l'étape 1.
+
+**Sur l'application mobile :**
+
+1. Activez la **géolocalisation** sur votre téléphone
+2. Rendez-vous physiquement à proximité de l'étape (rayon de **500 m**)
+3. Le bouton **Creuser** apparaît automatiquement lorsque vous êtes dans la zone ET que c'est la prochaine étape à valider
+4. Appuyez sur **Creuser** pour valider ✅
+5. Vous gagnez les points associés à cette étape
+
+> Si le bouton n'apparaît pas, vérifiez que la géolocalisation est activée et que vous êtes dans le rayon des 500 m.
+
+**Sur l'application web :**
+
+1. Sur la page de détail, trouvez l'étape à valider (dans l'ordre)
 2. Cliquez sur le bouton **Creuser** à côté de l'étape
-3. Si vous êtes au bon endroit, l'étape est validée ✅
+3. L'étape est validée ✅
 4. Vous gagnez les points associés à cette étape
 
 ### Voir la réalité augmentée
@@ -197,6 +211,12 @@ Après avoir créé une chasse, dépliez-la dans **Mes chasses** et utilisez le 
 ### Je ne vois pas mes points
 → Vous devez d'abord **rejoindre** la chasse avant de pouvoir creuser.
 
+### Le bouton "Creuser" n'apparaît pas sur mobile
+→ Deux conditions sont requises : (1) être dans un rayon de 500 m de l'étape, et (2) que ce soit la prochaine étape dans l'ordre. Vérifiez que la géolocalisation est activée sur votre téléphone. Si le GPS est indisponible, un avertissement s'affiche sur la page.
+
+### Les étapes semblent bloquées après un retour sur la page
+→ Fermez et rouvrez la page de détail de la chasse pour rafraîchir la progression.
+
 ---
 
 ## 10. Raccourcis
@@ -208,7 +228,8 @@ Après avoir créé une chasse, dépliez-la dans **Mes chasses** et utilisez le 
 | Filtrer par difficulté | Sélecteur sur la liste des chasses |
 | Rejoindre une chasse publique | Bouton "Rejoindre" sur la page de détail |
 | Rejoindre une chasse privée | Saisir le code secret puis bouton "Rejoindre" |
-| Creuser | Bouton "Creuser" à côté de chaque étape |
+| Creuser (web) | Bouton "Creuser" à côté de l'étape en cours |
+| Creuser (mobile) | Se rendre dans le rayon 500 m → bouton apparaît automatiquement |
 | Voir la RA | Bouton "AR" à côté de chaque étape |
 | Classement | Menu "Classement" |
 | Mon profil | Cliquer sur son pseudo |
@@ -218,7 +239,29 @@ Après avoir créé une chasse, dépliez-la dans **Mes chasses** et utilisez le 
 
 ---
 
-## 11. Configuration requise
+## 11. Application Mobile
+
+L'application mobile Lootopia est disponible via **Expo Go** (iOS & Android).
+
+### Fonctionnalités disponibles sur mobile
+
+- Consulter et rechercher les chasses disponibles
+- Rejoindre une chasse (publique ou privée avec code secret)
+- Voir la carte interactive des étapes (Leaflet via WebView)
+- Creuser une étape **en étant physiquement sur place** (GPS requis, rayon 500 m)
+- Suivre sa progression en temps réel
+- Consulter le classement mondial
+- Gérer son profil et se déconnecter
+
+### Prérequis
+
+- Expo Go installé sur iOS ou Android
+- Même réseau Wi-Fi que le serveur (en développement)
+- Géolocalisation activée pour la validation des étapes
+
+---
+
+## 12. Configuration requise
 
 | Élément | Minimum |
 |---------|---------|
