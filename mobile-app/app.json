@@ -6,6 +6,7 @@
     "orientation": "default",
     "scheme": "lootopia",
     "userInterfaceStyle": "light",
+    "newArchEnabled": true,
     "plugins": [
       "expo-router",
       "expo-secure-store",
@@ -21,23 +22,53 @@
         {
           "locationWhenInUsePermission": "Lootopia a besoin de votre localisation pour les chasses au trésor."
         }
+      ],
+      [
+        "@reactvision/react-viro",
+        {
+          "android": {
+            "xRMode": [
+              "AR"
+            ]
+          }
+        }
       ]
     ],
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#b8860b"
       },
-      "package": "com.lootopia.mobile"
+      "package": "com.lootopia.mobile",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "ios": {
       "bundleIdentifier": "com.lootopia.mobile",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Allow $(PRODUCT_NAME) to access your photos",
+        "NSPhotoLibraryAddUsageDescription": "Allow $(PRODUCT_NAME) to save photos",
+        "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to use your camera",
+        "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to use your microphone"
+      }
     },
     "web": {
       "bundler": "metro"
     },
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "34f5fd5c-ada4-4eb9-9ce0-35dcd44128c9"
+      }
     }
   }
 }
