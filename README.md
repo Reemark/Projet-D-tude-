@@ -179,17 +179,19 @@ Projet-D-tude-/
 |---------|----------|-------|-------------|
 | GET | `/api/hunts` | Public | Lister les chasses actives |
 | GET | `/api/hunts/{id}` | Public | Détail d'une chasse |
-| POST | `/api/hunts` | PARTNER | Créer une chasse |
-| DELETE | `/api/hunts/{id}` | PARTNER | Supprimer une chasse |
-| GET | `/api/hunts/mine` | PARTNER | Mes chasses |
+| POST | `/api/hunts` | PARTNER/ADMIN | Créer une chasse |
+| PUT | `/api/hunts/{id}` | PARTNER/ADMIN | Modifier une chasse (owner ou admin) |
+| DELETE | `/api/hunts/{id}` | PARTNER/ADMIN | Supprimer une chasse (owner ou admin) |
+| GET | `/api/hunts/mine` | PARTNER/ADMIN | Mes chasses |
 
 ### Étapes
 
 | Méthode | Endpoint | Accès | Description |
 |---------|----------|-------|-------------|
 | GET | `/api/hunts/{id}/steps` | Public | Étapes d'une chasse |
-| POST | `/api/hunts/{id}/steps` | PARTNER | Ajouter une étape |
-| DELETE | `/api/hunts/{id}/steps/{stepId}` | PARTNER | Supprimer une étape |
+| POST | `/api/hunts/{id}/steps` | PARTNER/ADMIN | Ajouter une étape |
+| PUT | `/api/hunts/{id}/steps/{stepId}` | PARTNER/ADMIN | Modifier une étape |
+| DELETE | `/api/hunts/{id}/steps/{stepId}` | PARTNER/ADMIN | Supprimer une étape |
 
 ### Participation & Progression
 
