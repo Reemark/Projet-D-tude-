@@ -62,7 +62,7 @@ export default function HuntDetail() {
 
   const handleJoin = async (secretCode?: string, fromModal = false) => {
     try {
-      await api.post(`/participations/join/${id}`, secretCode ? { secretCode } : null);
+      await api.post(`/participations/join/${id}`, { secretCode: secretCode ?? null });
       setJoined(true); setShowCodeModal(false); setSecretCodeInput(''); setCodeError('');
       setMessage('Vous avez rejoint la chasse !');
     } catch (err: any) {
