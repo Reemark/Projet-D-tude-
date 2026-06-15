@@ -51,6 +51,27 @@ public class HuntService {
         return toResponse(hunt);
     }
 
+    public HuntDto.Response update(Integer id, HuntDto.UpdateRequest request, String email) {
+        Hunt hunt = huntRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Chasse non trouvée"));
+        User requester = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Utilisateur non trouvé"));
+        boolean isOwner = hunt.getCreator().getEmail().equals(email);
+        boolean isAdmin = requester.getRole().name().equals("ADMIN");
+        if (!isOwner && !isAdmin) {
+            throw new ForbiddenException("Non autorisé à modifier cette chasse");
+        }
+        hunt.setTitle(request.title());
+        hunt.setDescription(request.description());
+        hunt.setDifficulty(request.difficulty());
+        if (request.secretCode() != null && !request.secretCode().isBlank()) {
+            hunt.setSecretCode(request.secretCode().trim());
+        } else {
+            hunt.setSecretCode(null);
+        }
+        return toResponse(huntRepository.save(hunt));
+    }
+
     public List<HuntDto.Response> getAllActive() {
         return huntRepository.findByIsActiveTrue().stream().map(this::toResponse).toList();
     }

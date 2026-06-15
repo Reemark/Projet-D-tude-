@@ -15,6 +15,13 @@ public class HuntDto {
             String secretCode
     ) {}
 
+    public record UpdateRequest(
+            @NotBlank String title,
+            String description,
+            @NotNull Difficulty difficulty,
+            String secretCode
+    ) {}
+
     public record Response(
             Integer id,
             String title,

@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Plus, Trash2, MapPin, Lock, ChevronRight, Target, X } from 'lucide-react';
+import { Plus, Trash2, MapPin, Lock, ChevronRight, Target, X, Pencil, Check } from 'lucide-react';
 import api from '../services/api';
 import { DEFAULT_MODELS } from '../components/ArViewer';
 
-interface Hunt { id: number; title: string; difficulty: string; isPrivate: boolean; createdAt: string; }
-interface Step { id: number; stepOrder: number; latitude: number; longitude: number; arContent: string; clue: string; score: number; }
+interface Hunt { id: number; title: string; description?: string; difficulty: string; isPrivate: boolean; createdAt: string; }
+interface Step { id: number; stepOrder: number; latitude: number; longitude: number; arContent: string; clue: string; score: number; arModelUrl?: string; }
 
 const difficultyLabel: Record<string, string> = { EASY: 'Facile', MEDIUM: 'Moyen', HARD: 'Difficile' };
+
+const emptyStepForm = { latitude: '', longitude: '', clue: '', arContent: 'TEXT', arModelUrl: '', arModelPreset: 'CHEST', score: '10' };
 
 export default function PartnerHunts() {
   const [hunts, setHunts] = useState<Hunt[]>([]);
@@ -18,9 +20,18 @@ export default function PartnerHunts() {
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
   const [selectedHuntId, setSelectedHuntId] = useState<number | null>(null);
   const [steps, setSteps] = useState<Step[]>([]);
-  const [stepForm, setStepForm] = useState({
-    latitude: '', longitude: '', clue: '', arContent: 'TEXT', arModelUrl: '', arModelPreset: 'CHEST', score: '10',
-  });
+  const [stepForm, setStepForm] = useState(emptyStepForm);
+
+  // Edit hunt state
+  const [editingHunt, setEditingHunt] = useState<Hunt | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editDifficulty, setEditDifficulty] = useState('MEDIUM');
+  const [editSecretCode, setEditSecretCode] = useState('');
+
+  // Edit step state
+  const [editingStep, setEditingStep] = useState<Step | null>(null);
+  const [editStep, setEditStep] = useState(emptyStepForm);
 
   useEffect(() => { loadHunts(); }, []);
   useEffect(() => { if (selectedHuntId) loadSteps(selectedHuntId); }, [selectedHuntId]);
@@ -47,8 +58,32 @@ export default function PartnerHunts() {
     try {
       await api.delete(`/hunts/${id}`);
       if (selectedHuntId === id) { setSelectedHuntId(null); setSteps([]); }
+      if (editingHunt?.id === id) setEditingHunt(null);
       loadHunts();
     } catch { notify('Erreur lors de la suppression', 'error'); }
+  };
+
+  const startEditHunt = (e: React.MouseEvent, hunt: Hunt) => {
+    e.stopPropagation();
+    setEditingHunt(hunt);
+    setEditTitle(hunt.title);
+    setEditDescription(hunt.description || '');
+    setEditDifficulty(hunt.difficulty);
+    setEditSecretCode('');
+  };
+
+  const handleUpdateHunt = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingHunt) return;
+    try {
+      await api.put(`/hunts/${editingHunt.id}`, {
+        title: editTitle, description: editDescription,
+        difficulty: editDifficulty, secretCode: editSecretCode.trim() || null,
+      });
+      setEditingHunt(null);
+      notify('Chasse modifiée !');
+      loadHunts();
+    } catch { notify('Erreur lors de la modification', 'error'); }
   };
 
   const handleAddStep = async (e: React.FormEvent) => {
@@ -63,10 +98,36 @@ export default function PartnerHunts() {
           ? (stepForm.arModelUrl || DEFAULT_MODELS[stepForm.arModelPreset]?.url || null) : null,
         score: parseInt(stepForm.score),
       });
-      setStepForm({ latitude: '', longitude: '', clue: '', arContent: 'TEXT', arModelUrl: '', arModelPreset: 'CHEST', score: '10' });
+      setStepForm(emptyStepForm);
       notify('Étape ajoutée !');
       loadSteps(selectedHuntId);
     } catch { notify("Erreur lors de l'ajout de l'étape", 'error'); }
+  };
+
+  const startEditStep = (step: Step) => {
+    setEditingStep(step);
+    setEditStep({
+      latitude: String(step.latitude), longitude: String(step.longitude),
+      clue: step.clue, arContent: step.arContent,
+      arModelUrl: step.arModelUrl || '', arModelPreset: 'CHEST', score: String(step.score),
+    });
+  };
+
+  const handleUpdateStep = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingStep || !selectedHuntId) return;
+    try {
+      await api.put(`/hunts/${selectedHuntId}/steps/${editingStep.id}`, {
+        latitude: parseFloat(editStep.latitude), longitude: parseFloat(editStep.longitude),
+        clue: editStep.clue, arContent: editStep.arContent,
+        arModelUrl: editStep.arContent === 'OBJECT_3D'
+          ? (editStep.arModelUrl || DEFAULT_MODELS[editStep.arModelPreset]?.url || null) : null,
+        score: parseInt(editStep.score),
+      });
+      setEditingStep(null);
+      notify('Étape modifiée !');
+      loadSteps(selectedHuntId);
+    } catch { notify("Erreur lors de la modification de l'étape", 'error'); }
   };
 
   const handleDeleteStep = async (stepId: number) => {
@@ -94,6 +155,7 @@ export default function PartnerHunts() {
         }`}>{message}</div>
       )}
 
+      {/* Formulaire création */}
       <form onSubmit={handleCreate} data-aos="fade-up" data-aos-delay="100" className="bg-white border border-stone-200 rounded-2xl p-6 mb-8 shadow-sm">
         <h2 className="text-base font-semibold text-ink font-display mb-5 flex items-center gap-2">
           <Plus size={16} className="text-gold" /> Nouvelle chasse
@@ -125,38 +187,81 @@ export default function PartnerHunts() {
         </button>
       </form>
 
+      {/* Liste des chasses */}
       {hunts.length > 0 && (
         <div className="mb-8">
           <p className="text-xs text-stone-400 uppercase tracking-widest mb-3 font-medium">Chasses existantes</p>
           <div className="space-y-2">
             {hunts.map((hunt, i) => (
-              <div key={hunt.id} onClick={() => setSelectedHuntId(hunt.id)}
-                data-aos="fade-up" data-aos-delay={String(i * 50)}
-                className={`border rounded-xl px-4 py-3.5 flex justify-between items-center cursor-pointer transition-all duration-200 shadow-sm ${
-                  selectedHuntId === hunt.id
-                    ? 'border-gold/50 bg-gold-pale/40 shadow-gold/10 scale-[1.01]'
-                    : 'border-stone-200 bg-white hover:border-stone-300 hover:-translate-y-0.5 hover:shadow-md'
-                }`}>
-                <div className="flex items-center gap-3 min-w-0">
-                  <ChevronRight size={14} className={selectedHuntId === hunt.id ? 'text-gold' : 'text-stone-300'} />
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium text-ink text-sm truncate">{hunt.title}</p>
-                      {hunt.isPrivate && <Lock size={11} className="text-amber-500 shrink-0" />}
+              <div key={hunt.id}>
+                <div onClick={() => { setSelectedHuntId(hunt.id); setEditingHunt(null); }}
+                  data-aos="fade-up" data-aos-delay={String(i * 50)}
+                  className={`border rounded-xl px-4 py-3.5 flex justify-between items-center cursor-pointer transition-all duration-200 shadow-sm ${
+                    selectedHuntId === hunt.id
+                      ? 'border-gold/50 bg-gold-pale/40 shadow-gold/10 scale-[1.01]'
+                      : 'border-stone-200 bg-white hover:border-stone-300 hover:-translate-y-0.5 hover:shadow-md'
+                  }`}>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <ChevronRight size={14} className={selectedHuntId === hunt.id ? 'text-gold' : 'text-stone-300'} />
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-ink text-sm truncate">{hunt.title}</p>
+                        {hunt.isPrivate && <Lock size={11} className="text-amber-500 shrink-0" />}
+                      </div>
+                      <p className="text-xs text-stone-400 mt-0.5">{difficultyLabel[hunt.difficulty]}</p>
                     </div>
-                    <p className="text-xs text-stone-400 mt-0.5">{difficultyLabel[hunt.difficulty]}</p>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={(e) => startEditHunt(e, hunt)}
+                      className="p-2 rounded-lg text-stone-300 hover:text-gold hover:bg-gold-pale/50 transition">
+                      <Pencil size={14} />
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); handleDelete(hunt.id); }}
+                      className="p-2 rounded-lg text-stone-300 hover:text-red-500 hover:bg-red-50 transition">
+                      <Trash2 size={15} />
+                    </button>
                   </div>
                 </div>
-                <button onClick={(e) => { e.stopPropagation(); handleDelete(hunt.id); }}
-                  className="shrink-0 p-2 rounded-lg text-stone-300 hover:text-red-500 hover:bg-red-50 transition">
-                  <Trash2 size={15} />
-                </button>
+
+                {/* Formulaire d'édition inline */}
+                {editingHunt?.id === hunt.id && (
+                  <form onSubmit={handleUpdateHunt}
+                    className="mt-2 border border-gold/30 bg-gold-pale/20 rounded-xl p-4 space-y-3">
+                    <p className="text-xs font-semibold text-gold uppercase tracking-wider flex items-center gap-1.5">
+                      <Pencil size={11} /> Modifier la chasse
+                    </p>
+                    <input type="text" value={editTitle} onChange={(e) => setEditTitle(e.target.value)}
+                      placeholder="Titre" className={inputClass} required />
+                    <textarea value={editDescription} onChange={(e) => setEditDescription(e.target.value)}
+                      placeholder="Description" className={`${inputClass} resize-none`} rows={2} />
+                    <select value={editDifficulty} onChange={(e) => setEditDifficulty(e.target.value)}
+                      className={`w-full ${selectClass}`}>
+                      <option value="EASY">Facile</option>
+                      <option value="MEDIUM">Moyen</option>
+                      <option value="HARD">Difficile</option>
+                    </select>
+                    <input type="text" value={editSecretCode} onChange={(e) => setEditSecretCode(e.target.value)}
+                      placeholder="Nouveau code secret (laisser vide = public)"
+                      className={`${inputClass} tracking-widest uppercase`} />
+                    <div className="flex gap-2">
+                      <button type="submit"
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-light transition">
+                        <Check size={14} /> Enregistrer
+                      </button>
+                      <button type="button" onClick={() => setEditingHunt(null)}
+                        className="px-4 py-2 rounded-lg border border-stone-200 text-stone-500 text-sm hover:bg-stone-50 transition">
+                        Annuler
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
             ))}
           </div>
         </div>
       )}
 
+      {/* Gestion des étapes */}
       {selectedHuntId && (
         <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm">
           <h2 className="text-base font-semibold text-ink font-display mb-5 flex items-center gap-2">
@@ -167,15 +272,72 @@ export default function PartnerHunts() {
           {steps.length > 0 && (
             <div className="space-y-2 mb-6">
               {steps.map((step) => (
-                <div key={step.id} className="bg-parchment border border-stone-200 rounded-xl px-4 py-3 flex justify-between items-center">
-                  <div>
-                    <p className="font-medium text-sm text-ink">Étape {step.stepOrder} — {step.clue}</p>
-                    <p className="text-xs text-stone-400 mt-0.5">{step.latitude}, {step.longitude} · {step.score} pts · {step.arContent}</p>
-                  </div>
-                  <button onClick={() => handleDeleteStep(step.id)}
-                    className="p-1.5 rounded-lg text-stone-300 hover:text-red-500 hover:bg-red-50 transition">
-                    <X size={14} />
-                  </button>
+                <div key={step.id}>
+                  {editingStep?.id === step.id ? (
+                    <form onSubmit={handleUpdateStep}
+                      className="border border-gold/30 bg-gold-pale/20 rounded-xl p-4 space-y-3">
+                      <p className="text-xs font-semibold text-gold uppercase tracking-wider flex items-center gap-1.5">
+                        <Pencil size={11} /> Modifier étape {step.stepOrder}
+                      </p>
+                      <div className="grid grid-cols-2 gap-3">
+                        <input type="number" step="any" placeholder="Latitude" value={editStep.latitude}
+                          onChange={(e) => setEditStep({ ...editStep, latitude: e.target.value })}
+                          className={inputClass} required />
+                        <input type="number" step="any" placeholder="Longitude" value={editStep.longitude}
+                          onChange={(e) => setEditStep({ ...editStep, longitude: e.target.value })}
+                          className={inputClass} required />
+                      </div>
+                      <input type="text" placeholder="Indice" value={editStep.clue}
+                        onChange={(e) => setEditStep({ ...editStep, clue: e.target.value })}
+                        className={inputClass} required />
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs text-stone-400 mb-1.5">Type de contenu AR</label>
+                          <select value={editStep.arContent}
+                            onChange={(e) => setEditStep({ ...editStep, arContent: e.target.value })}
+                            className={`w-full ${selectClass}`}>
+                            <option value="TEXT">Texte — message affiché en AR</option>
+                            <option value="IMAGE">Image — visuel en AR</option>
+                            <option value="VIDEO">Vidéo — lecture en AR</option>
+                            <option value="OBJECT_3D">Objet 3D — modèle GLTF animé</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-stone-400 mb-1.5">Points attribués à cette étape</label>
+                          <input type="number" min="1" placeholder="Ex: 10" value={editStep.score}
+                            onChange={(e) => setEditStep({ ...editStep, score: e.target.value })}
+                            className={inputClass} required />
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button type="submit"
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gold text-white text-sm font-semibold hover:bg-gold-light transition">
+                          <Check size={14} /> Enregistrer
+                        </button>
+                        <button type="button" onClick={() => setEditingStep(null)}
+                          className="px-4 py-2 rounded-lg border border-stone-200 text-stone-500 text-sm hover:bg-stone-50 transition">
+                          Annuler
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <div className="bg-parchment border border-stone-200 rounded-xl px-4 py-3 flex justify-between items-center">
+                      <div>
+                        <p className="font-medium text-sm text-ink">Étape {step.stepOrder} — {step.clue}</p>
+                        <p className="text-xs text-stone-400 mt-0.5">{step.latitude}, {step.longitude} · {step.score} pts · {step.arContent}</p>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <button onClick={() => startEditStep(step)}
+                          className="p-1.5 rounded-lg text-stone-300 hover:text-gold hover:bg-gold-pale/50 transition">
+                          <Pencil size={13} />
+                        </button>
+                        <button onClick={() => handleDeleteStep(step.id)}
+                          className="p-1.5 rounded-lg text-stone-300 hover:text-red-500 hover:bg-red-50 transition">
+                          <X size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -195,15 +357,21 @@ export default function PartnerHunts() {
               onChange={(e) => setStepForm({ ...stepForm, clue: e.target.value })}
               className={`${inputClass} mb-3`} required />
             <div className="grid grid-cols-2 gap-3 mb-3">
-              <select value={stepForm.arContent} onChange={(e) => setStepForm({ ...stepForm, arContent: e.target.value })}
-                className={`w-full ${selectClass}`}>
-                <option value="TEXT">Texte</option>
-                <option value="IMAGE">Image</option>
-                <option value="VIDEO">Vidéo</option>
-                <option value="OBJECT_3D">Objet 3D</option>
-              </select>
-              <input type="number" min="1" placeholder="Points" value={stepForm.score}
-                onChange={(e) => setStepForm({ ...stepForm, score: e.target.value })} className={inputClass} required />
+              <div>
+                <label className="block text-xs text-stone-400 mb-1.5">Type de contenu AR</label>
+                <select value={stepForm.arContent} onChange={(e) => setStepForm({ ...stepForm, arContent: e.target.value })}
+                  className={`w-full ${selectClass}`}>
+                  <option value="TEXT">Texte — message affiché en AR</option>
+                  <option value="IMAGE">Image — visuel en AR</option>
+                  <option value="VIDEO">Vidéo — lecture en AR</option>
+                  <option value="OBJECT_3D">Objet 3D — modèle GLTF animé</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-stone-400 mb-1.5">Points attribués à cette étape</label>
+                <input type="number" min="1" placeholder="Ex: 10" value={stepForm.score}
+                  onChange={(e) => setStepForm({ ...stepForm, score: e.target.value })} className={inputClass} required />
+              </div>
             </div>
 
             {stepForm.arContent === 'OBJECT_3D' && (
