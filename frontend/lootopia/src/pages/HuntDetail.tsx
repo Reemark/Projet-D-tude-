@@ -147,44 +147,32 @@ export default function HuntDetail() {
             className="px-8 py-3 rounded-xl bg-gold text-white font-semibold hover:bg-gold-light active:scale-[0.98] transition-all shadow-md shadow-gold/20 text-sm flex items-center gap-2">
             {hunt.isPrivate ? <><Lock size={15} /> Rejoindre (code requis)</> : 'Rejoindre cette chasse'}
           </button>
-        </div>
-      )}
-
-      {showCodeModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
-          <div className="bg-white border border-stone-200 rounded-2xl p-7 w-full max-w-sm shadow-2xl">
-            <div className="text-center mb-5">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gold-pale border border-gold/30 mb-3">
-                <Lock size={22} className="text-gold" />
-              </div>
-              <h3 className="text-lg font-bold text-ink font-display">Chasse privée</h3>
-              <p className="text-sm text-stone-400 mt-1">Entrez le code secret pour rejoindre.</p>
-            </div>
-            <input type="text" placeholder="CODE SECRET" value={secretCodeInput}
-              onChange={(e) => { setSecretCodeInput(e.target.value); setCodeError(''); }}
-              onKeyDown={(e) => e.key === 'Enter' && handleJoin(secretCodeInput, true)}
-              className={`w-full px-4 py-3 border rounded-xl text-ink placeholder-stone-300 focus:outline-none transition mb-2 text-center tracking-[0.3em] text-sm font-semibold uppercase bg-parchment ${
-                codeError ? 'border-red-300 focus:border-red-400' : 'border-stone-200 focus:border-gold'
-              }`}
-              autoFocus />
-            {codeError && (
-              <p className="flex items-center justify-center gap-1.5 text-red-500 text-xs mb-3">
-                <AlertCircle size={13} /> {codeError}
-              </p>
-            )}
-            {!codeError && <div className="mb-3" />}
-            <div className="flex gap-3">
-              <button onClick={() => { setShowCodeModal(false); setSecretCodeInput(''); setCodeError(''); }}
-                className="flex-1 py-2.5 rounded-xl border border-stone-200 text-stone-500 hover:bg-stone-50 transition text-sm">
-                Annuler
-              </button>
-              <button onClick={() => handleJoin(secretCodeInput, true)}
+          {showCodeModal && (
+            <div className="mt-3 flex flex-col gap-2 max-w-xs">
+              <input
+                type="text"
+                placeholder="Code secret"
+                value={secretCodeInput}
+                onChange={(e) => { setSecretCodeInput(e.target.value); setCodeError(''); }}
+                onKeyDown={(e) => e.key === 'Enter' && handleJoin(secretCodeInput, true)}
+                className={`px-4 py-2.5 border rounded-xl text-ink placeholder-stone-300 focus:outline-none transition text-sm tracking-widest uppercase bg-parchment ${
+                  codeError ? 'border-red-300 focus:border-red-400' : 'border-stone-200 focus:border-gold'
+                }`}
+                autoFocus
+              />
+              {codeError && (
+                <p className="flex items-center gap-1.5 text-red-500 text-xs">
+                  <AlertCircle size={13} /> {codeError}
+                </p>
+              )}
+              <button
+                onClick={() => handleJoin(secretCodeInput, true)}
                 disabled={!secretCodeInput.trim()}
-                className="flex-1 py-2.5 rounded-xl bg-gold text-white font-semibold hover:bg-gold-light disabled:opacity-40 disabled:cursor-not-allowed transition text-sm">
-                Rejoindre
+                className="px-6 py-2.5 rounded-xl bg-gold text-white font-semibold hover:bg-gold-light disabled:opacity-40 disabled:cursor-not-allowed transition text-sm">
+                Confirmer
               </button>
             </div>
-          </div>
+          )}
         </div>
       )}
 
@@ -193,7 +181,7 @@ export default function HuntDetail() {
           <MapPin size={16} className="text-gold" /> Carte des étapes
         </h2>
         {steps.length > 0 ? (
-          <div className="rounded-xl overflow-hidden border border-stone-200 shadow-sm">
+          <div className="rounded-xl overflow-hidden border border-stone-200 shadow-sm isolate">
             <HuntMap steps={steps} />
           </div>
         ) : (
