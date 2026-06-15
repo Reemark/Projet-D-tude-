@@ -33,20 +33,22 @@ export default function HuntMap({ steps, center }: HuntMapProps) {
     : [48.8566, 2.3522] as [number, number]);
 
   return (
-    <MapContainer center={mapCenter} zoom={13} className="h-96 w-full rounded-lg">
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {steps.map((step) => (
-        <Marker key={step.id} position={[step.latitude, step.longitude]}>
-          <Popup>
-            <strong>Étape {step.stepOrder}</strong><br />
-            {step.clue}<br />
-            <span className="text-sm text-gray-500">{step.score} points</span>
-          </Popup>
-        </Marker>
-      ))}
-    </MapContainer>
+    <div className="relative z-0">
+      <MapContainer center={mapCenter} zoom={13} className="h-96 w-full rounded-lg">
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        {steps.map((step) => (
+          <Marker key={step.id} position={[step.latitude, step.longitude]}>
+            <Popup>
+              <strong>Étape {step.stepOrder}</strong><br />
+              {step.clue}<br />
+              <span className="text-sm text-gray-500">{step.score} points</span>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
+    </div>
   );
 }
