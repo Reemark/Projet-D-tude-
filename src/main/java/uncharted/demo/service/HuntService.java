@@ -5,8 +5,12 @@ import uncharted.demo.dto.HuntDto;
 import uncharted.demo.exception.ForbiddenException;
 import uncharted.demo.exception.NotFoundException;
 import uncharted.demo.model.Hunt;
+import uncharted.demo.model.Step;
 import uncharted.demo.model.User;
 import uncharted.demo.repository.HuntRepository;
+import uncharted.demo.repository.ParticipationRepository;
+import uncharted.demo.repository.StepRepository;
+import uncharted.demo.repository.UserProgressRepository;
 import uncharted.demo.repository.UserRepository;
 
 import java.util.List;
@@ -16,10 +20,18 @@ public class HuntService {
 
     private final HuntRepository huntRepository;
     private final UserRepository userRepository;
+    private final StepRepository stepRepository;
+    private final ParticipationRepository participationRepository;
+    private final UserProgressRepository userProgressRepository;
 
-    public HuntService(HuntRepository huntRepository, UserRepository userRepository) {
+    public HuntService(HuntRepository huntRepository, UserRepository userRepository,
+                       StepRepository stepRepository, ParticipationRepository participationRepository,
+                       UserProgressRepository userProgressRepository) {
         this.huntRepository = huntRepository;
         this.userRepository = userRepository;
+        this.stepRepository = stepRepository;
+        this.participationRepository = participationRepository;
+        this.userProgressRepository = userProgressRepository;
     }
 
     public HuntDto.Response create(HuntDto.CreateRequest request, String creatorEmail) {
@@ -58,9 +70,17 @@ public class HuntService {
     public void delete(Integer id, String email) {
         Hunt hunt = huntRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Chasse non trouvée"));
-        if (!hunt.getCreator().getEmail().equals(email)) {
+        User requester = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Utilisateur non trouvé"));
+        boolean isOwner = hunt.getCreator().getEmail().equals(email);
+        boolean isAdmin = requester.getRole().name().equals("ADMIN");
+        if (!isOwner && !isAdmin) {
             throw new ForbiddenException("Non autorisé à supprimer cette chasse");
         }
+        // Supprimer progression, étapes et participations avant la chasse
+        userProgressRepository.deleteByHuntId(id);
+        stepRepository.deleteAll(stepRepository.findByHuntIdOrderByStepOrderAsc(id));
+        participationRepository.deleteAll(participationRepository.findByHuntId(id));
         huntRepository.delete(hunt);
     }
 
