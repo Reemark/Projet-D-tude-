@@ -99,6 +99,18 @@
 
 ---
 
+## Epic 9 : Application Mobile
+
+| ID | User Story | Priorité | Statut | Sprint |
+|----|-----------|----------|--------|--------|
+| US-33 | En tant que joueur, je veux accéder à Lootopia depuis mon smartphone via Expo Go | P1 | ✅ | 4 |
+| US-34 | En tant que joueur, je veux que le bouton "Creuser" n'apparaisse que lorsque je suis dans un rayon de 500 m de l'étape | P0 | ✅ | 4 |
+| US-35 | En tant que joueur, je veux être obligé de valider les étapes dans l'ordre sur mobile | P0 | ✅ | 4 |
+| US-36 | En tant que joueur, je veux voir la carte interactive des étapes sur mobile | P1 | ✅ | 4 |
+| US-37 | En tant que joueur, je veux que l'interface mobile respecte la zone sécurisée de l'iPhone (notch, Dynamic Island) | P1 | ✅ | 4 |
+
+---
+
 ## Epic 8 : Qualité & DevOps
 
 | ID | User Story | Priorité | Statut | Sprint |

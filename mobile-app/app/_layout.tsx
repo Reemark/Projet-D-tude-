@@ -28,6 +28,7 @@ function RootLayoutNav() {
           title: 'Détail de la chasse',
           headerTintColor: '#1c1a16',
           headerStyle: { backgroundColor: '#fef3c7' },
+          headerBackTitle: 'Chasses',
         }}
       />
       <Stack.Screen

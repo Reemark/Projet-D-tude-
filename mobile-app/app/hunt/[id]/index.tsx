@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
   ActivityIndicator, Alert, TextInput, Modal,
 } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Location from 'expo-location';
 import api from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
 import type { Hunt, Step, Progress, Participation } from '@/types';
@@ -14,6 +15,19 @@ const DIFF: Record<string, { bg: string; text: string; label: string }> = {
   MEDIUM: { bg: '#fffbeb', text: '#92400e', label: 'Moyen' },
   HARD:   { bg: '#fef2f2', text: '#991b1b', label: 'Difficile' },
 };
+
+const DIG_RADIUS = 500; // mètres
+
+function distanceTo(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLng = (lng2 - lng1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 
 export default function HuntDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -30,7 +44,9 @@ export default function HuntDetailScreen() {
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [secretCode, setSecretCode] = useState('');
   const [codeError, setCodeError] = useState('');
+  const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
 
+  // Chargement initial hunt + steps
   useEffect(() => {
     Promise.all([
       api.get(`/hunts/${id}`),
@@ -42,16 +58,45 @@ export default function HuntDetailScreen() {
     }).catch(() => setLoading(false));
   }, [id]);
 
+  // GPS en arrière-plan
   useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === 'granted') {
+        const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+        setUserPos({ lat: loc.coords.latitude, lng: loc.coords.longitude });
+      }
+    })();
+  }, []);
+
+  // Refresh participations + progression à chaque fois que l'écran est actif
+  const loadProgress = useCallback(() => {
     if (!isAuthenticated || !id) return;
     api.get('/participations/mine').then((res) => {
       const p = res.data.find((p: Participation) => p.huntId === Number(id));
-      if (p) { setJoined(true); if (p.status === 'FINISHED') setFinished(true); }
+      if (p) {
+        setJoined(true);
+        if (p.status === 'FINISHED') setFinished(true);
+      }
     }).catch(() => {});
     api.get(`/progress/hunt/${id}`).then((res) => setProgress(res.data)).catch(() => {});
   }, [isAuthenticated, id]);
 
-  const isCompleted = (stepId: number) => progress.some((p) => p.stepId === stepId && p.isCompleted);
+  useFocusEffect(loadProgress);
+
+  const isStepDone = (stepId: number) => progress.some((p) => p.stepId === stepId && p.completed);
+
+  // Prochaine étape à débloquer (ordre croissant, première non faite)
+  const nextStep = [...steps]
+    .sort((a, b) => a.stepOrder - b.stepOrder)
+    .find((s) => !isStepDone(s.id));
+
+  const canDig = (step: Step): boolean => {
+    if (!joined || isStepDone(step.id)) return false;
+    if (step.id !== nextStep?.id) return false;
+    if (!userPos) return false;
+    return distanceTo(userPos.lat, userPos.lng, step.latitude, step.longitude) <= DIG_RADIUS;
+  };
 
   const handleJoin = async (code?: string, fromModal = false) => {
     try {
@@ -61,6 +106,7 @@ export default function HuntDetailScreen() {
       setSecretCode('');
       setCodeError('');
       setMessage('Vous avez rejoint la chasse !');
+      loadProgress();
     } catch (err: any) {
       const status = err.response?.status;
       const serverMsg = err.response?.data?.message;
@@ -85,10 +131,10 @@ export default function HuntDetailScreen() {
   const handleDig = async (stepId: number) => {
     try {
       await api.post(`/progress/dig/${stepId}`);
-      const newProgress = [...progress, { stepId, isCompleted: true }];
+      const newProgress: Progress[] = [...progress, { stepId, completed: true }];
       setProgress(newProgress);
       setMessage('Étape complétée !');
-      if (steps.length > 0 && newProgress.filter((p) => p.isCompleted).length >= steps.length) {
+      if (steps.length > 0 && newProgress.filter((p) => p.completed).length >= steps.length) {
         setFinished(true);
         setMessage('Félicitations ! Chasse terminée !');
       }
@@ -120,7 +166,7 @@ export default function HuntDetailScreen() {
   }
 
   const diff = DIFF[hunt.difficulty] ?? DIFF.EASY;
-  const completedCount = progress.filter((p) => p.isCompleted).length;
+  const completedCount = progress.filter((p) => p.completed).length;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -171,7 +217,7 @@ export default function HuntDetailScreen() {
         </View>
       )}
 
-      {/* Map button — visible seulement si inscrit */}
+      {/* Map button */}
       {joined && (
         <TouchableOpacity style={styles.mapBtn} onPress={openMap}>
           <Ionicons name="map-outline" size={16} color="#b8860b" />
@@ -192,12 +238,26 @@ export default function HuntDetailScreen() {
         </TouchableOpacity>
       )}
 
+      {/* GPS indisponible */}
+      {joined && !finished && !userPos && (
+        <View style={styles.gpsWarning}>
+          <Ionicons name="location-outline" size={14} color="#92400e" />
+          <Text style={styles.gpsWarningText}>GPS non disponible — impossible d'afficher les boutons "Creuser"</Text>
+        </View>
+      )}
+
       {/* Steps list */}
       <Text style={styles.stepsTitle}>
         <Ionicons name="list-outline" size={15} color="#b8860b" /> Étapes
       </Text>
-      {steps.map((step) => {
-        const done = isCompleted(step.id);
+      {[...steps].sort((a, b) => a.stepOrder - b.stepOrder).map((step) => {
+        const done = isStepDone(step.id);
+        const isNext = step.id === nextStep?.id;
+        const inRange = userPos
+          ? distanceTo(userPos.lat, userPos.lng, step.latitude, step.longitude) <= DIG_RADIUS
+          : false;
+        const showDig = isAuthenticated && joined && !done && isNext && inRange;
+
         return (
           <View key={step.id} style={[styles.stepCard, done && styles.stepCardDone]}>
             <View style={styles.stepLeft}>
@@ -210,14 +270,12 @@ export default function HuntDetailScreen() {
                 <Text style={styles.stepMeta}>{step.score} pts · {step.arContent}</Text>
               </View>
             </View>
-            <View style={styles.stepActions}>
-              {isAuthenticated && joined && !done && (
-                <TouchableOpacity style={styles.digBtn} onPress={() => handleDig(step.id)}>
-                  <Ionicons name="hammer-outline" size={13} color="#b8860b" />
-                  <Text style={styles.digBtnText}>Creuser</Text>
-                </TouchableOpacity>
-              )}
-            </View>
+            {showDig && (
+              <TouchableOpacity style={styles.digBtn} onPress={() => handleDig(step.id)}>
+                <Ionicons name="hammer-outline" size={13} color="#b8860b" />
+                <Text style={styles.digBtnText}>Creuser</Text>
+              </TouchableOpacity>
+            )}
           </View>
         );
       })}
@@ -286,7 +344,6 @@ const styles = StyleSheet.create({
   msgText: { fontSize: 13, color: '#065f46' },
   msgTextGold: { color: '#92400e' },
   finishedBanner: {
-    backgroundColor: 'linear-gradient(to right, #fffbeb, #fef3c7)',
     backgroundColor: '#fffbeb',
     borderRadius: 16, padding: 20, alignItems: 'center',
     borderWidth: 1, borderColor: '#fde68a', marginBottom: 16,
@@ -315,6 +372,12 @@ const styles = StyleSheet.create({
     shadowColor: '#b8860b', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 4,
   },
   joinBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  gpsWarning: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: '#fffbeb', borderRadius: 10, padding: 10,
+    borderWidth: 1, borderColor: '#fde68a', marginBottom: 12,
+  },
+  gpsWarningText: { fontSize: 12, color: '#92400e', flex: 1 },
   stepsTitle: { fontSize: 15, fontWeight: '700', color: '#1c1a16', marginBottom: 10 },
   stepCard: {
     backgroundColor: '#fff', borderRadius: 14, padding: 14, marginBottom: 10,
@@ -332,7 +395,6 @@ const styles = StyleSheet.create({
   stepNumDone: { color: '#065f46' },
   stepClue: { fontSize: 12, color: '#6b7280', marginTop: 2 },
   stepMeta: { fontSize: 11, color: '#9ca3af', marginTop: 4 },
-  stepActions: { flexDirection: 'row', gap: 8, alignItems: 'center', marginLeft: 10 },
   digBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
     backgroundColor: '#fef9ee', borderWidth: 1, borderColor: '#fde68a',

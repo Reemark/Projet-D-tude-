@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import * as Location from 'expo-location';
@@ -7,9 +8,10 @@ import { Ionicons } from '@expo/vector-icons';
 import api from '@/services/api';
 import type { Step, Progress } from '@/types';
 
-const AR_RADIUS = 50; // mètres
+const AR_RADIUS = 500; // mètres
 
 export default function HuntMapScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const { id, title } = useLocalSearchParams<{ id: string; title?: string }>();
 
@@ -65,7 +67,7 @@ export default function HuntMapScreen() {
 
   // ── HTML Leaflet ───────────────────────────────────────────────────────────
   const buildHtml = useCallback(() => {
-    const completedIds = progress.filter((p) => p.isCompleted).map((p) => p.stepId);
+    const completedIds = progress.filter((p) => p.completed).map((p) => p.stepId);
     const nextStep = steps.find((s) => !completedIds.includes(s.id));
 
     const enriched = steps.map((step) => {
@@ -235,7 +237,7 @@ window.ReactNativeWebView && window.ReactNativeWebView.postMessage('ready');
   if (loading) {
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
           <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={20} color="#1c1a16" />
           </TouchableOpacity>
@@ -251,7 +253,7 @@ window.ReactNativeWebView && window.ReactNativeWebView.postMessage('ready');
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={20} color="#1c1a16" />
         </TouchableOpacity>

@@ -24,7 +24,7 @@ export interface Step {
 
 export interface Progress {
   stepId: number;
-  isCompleted: boolean;
+  completed: boolean;
 }
 
 export interface User {
