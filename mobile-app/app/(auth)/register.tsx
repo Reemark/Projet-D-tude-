@@ -3,7 +3,9 @@ import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   KeyboardAvoidingView, Platform, ActivityIndicator, Alert, ScrollView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/context/AuthContext';
 
 export default function RegisterScreen() {
@@ -39,13 +41,17 @@ export default function RegisterScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-        <View style={styles.card}>
-          <Text style={styles.title}>🧭 Lootopia</Text>
-          <Text style={styles.subtitle}>Créez votre compte</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+          <View style={styles.card}>
+            <View style={styles.logo}>
+              <Ionicons name="compass" size={58} color="#b8860b" />
+            </View>
+            <Text style={styles.title}>LOOTOPIA</Text>
+            <Text style={styles.subtitle}>Créez votre compte</Text>
 
           <View style={styles.toggle}>
             <TouchableOpacity
@@ -104,19 +110,22 @@ export default function RegisterScreen() {
             )}
           </TouchableOpacity>
 
-          <Link href="/(auth)/login" asChild>
-            <TouchableOpacity style={styles.link}>
-              <Text style={styles.linkText}>Déjà un compte ? Se connecter</Text>
-            </TouchableOpacity>
-          </Link>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+            <Link href="/(auth)/login" asChild>
+              <TouchableOpacity style={styles.link}>
+                <Text style={styles.linkText}>Déjà un compte ? Se connecter</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: '#fef3c7' },
   container: { flex: 1, backgroundColor: '#fef3c7' },
+  logo: { alignSelf: 'center', marginBottom: 10, width: 72, height: 72, justifyContent: 'center', alignItems: 'center' },
   scroll: { flexGrow: 1, justifyContent: 'center', padding: 24 },
   card: {
     backgroundColor: '#fff',
@@ -128,7 +137,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 6,
   },
-  title: { fontSize: 28, fontWeight: 'bold', color: '#1c1a16', textAlign: 'center', marginBottom: 6 },
+  title: { fontSize: 22, fontWeight: 'bold', color: '#b8860b', textAlign: 'center', marginBottom: 6, letterSpacing: 4 },
   subtitle: { fontSize: 13, color: '#6b7280', textAlign: 'center', marginBottom: 20 },
   toggle: {
     flexDirection: 'row',
