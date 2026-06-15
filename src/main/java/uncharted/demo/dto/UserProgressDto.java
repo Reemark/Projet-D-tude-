@@ -8,7 +8,7 @@ public class UserProgressDto {
             Integer id,
             Integer stepId,
             int stepOrder,
-            boolean isCompleted,
+            boolean completed,
             LocalDateTime completedAt
     ) {}
 }
