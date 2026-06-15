@@ -151,7 +151,7 @@ export default function HuntDetail() {
       )}
 
       {showCodeModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
           <div className="bg-white border border-stone-200 rounded-2xl p-7 w-full max-w-sm shadow-2xl">
             <div className="text-center mb-5">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gold-pale border border-gold/30 mb-3">
