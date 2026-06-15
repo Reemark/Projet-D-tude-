@@ -11,7 +11,11 @@ import uncharted.demo.exception.NotFoundException;
 import uncharted.demo.model.Difficulty;
 import uncharted.demo.model.Hunt;
 import uncharted.demo.model.User;
+import uncharted.demo.model.Role;
 import uncharted.demo.repository.HuntRepository;
+import uncharted.demo.repository.ParticipationRepository;
+import uncharted.demo.repository.StepRepository;
+import uncharted.demo.repository.UserProgressRepository;
 import uncharted.demo.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -25,10 +29,11 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class HuntServiceTest {
 
-    @Mock
-    private HuntRepository huntRepository;
-    @Mock
-    private UserRepository userRepository;
+    @Mock private HuntRepository huntRepository;
+    @Mock private UserRepository userRepository;
+    @Mock private StepRepository stepRepository;
+    @Mock private ParticipationRepository participationRepository;
+    @Mock private UserProgressRepository userProgressRepository;
 
     @InjectMocks
     private HuntService huntService;
@@ -68,11 +73,16 @@ class HuntServiceTest {
         User creator = new User();
         creator.setEmail("owner@test.com");
 
+        User requester = new User();
+        requester.setEmail("other@test.com");
+        requester.setRole(Role.USER);
+
         Hunt hunt = new Hunt();
         hunt.setId(1);
         hunt.setCreator(creator);
 
         when(huntRepository.findById(1)).thenReturn(Optional.of(hunt));
+        when(userRepository.findByEmail("other@test.com")).thenReturn(Optional.of(requester));
 
         assertThrows(ForbiddenException.class, () -> huntService.delete(1, "other@test.com"));
         verify(huntRepository, never()).delete(any());
