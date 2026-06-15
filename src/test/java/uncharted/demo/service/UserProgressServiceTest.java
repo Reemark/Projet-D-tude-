@@ -68,7 +68,7 @@ class UserProgressServiceTest {
 
         UserProgressDto.Response response = userProgressService.dig(1, "player@test.com");
 
-        assertTrue(response.isCompleted());
+        assertTrue(response.completed());
         verify(participationRepository).save(any());
     }
 
