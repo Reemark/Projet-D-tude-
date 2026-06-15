@@ -5,6 +5,15 @@ import uncharted.demo.model.ArContent;
 
 public class StepDto {
 
+    public record UpdateRequest(
+            @NotNull Double latitude,
+            @NotNull Double longitude,
+            ArContent arContent,
+            String clue,
+            String arModelUrl,
+            int score
+    ) {}
+
     public record CreateRequest(
             @NotNull Integer huntId,
             @NotNull Integer stepOrder,

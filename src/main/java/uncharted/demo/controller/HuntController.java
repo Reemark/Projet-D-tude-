@@ -37,6 +37,14 @@ public class HuntController {
         return ResponseEntity.ok(huntService.create(request, auth.getName()));
     }
 
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('PARTNER', 'ADMIN')")
+    public ResponseEntity<HuntDto.Response> update(@PathVariable Integer id,
+                                                    @Valid @RequestBody HuntDto.UpdateRequest request,
+                                                    Authentication auth) {
+        return ResponseEntity.ok(huntService.update(id, request, auth.getName()));
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('PARTNER', 'ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Integer id, Authentication auth) {

@@ -44,6 +44,18 @@ public class StepService {
                 .stream().map(this::toResponse).toList();
     }
 
+    public StepDto.Response update(Integer stepId, StepDto.UpdateRequest request) {
+        Step step = stepRepository.findById(stepId)
+                .orElseThrow(() -> new NotFoundException("Étape non trouvée"));
+        step.setLatitude(request.latitude());
+        step.setLongitude(request.longitude());
+        step.setArContent(request.arContent());
+        step.setClue(request.clue());
+        step.setArModelUrl(request.arModelUrl());
+        step.setScore(request.score());
+        return toResponse(stepRepository.save(step));
+    }
+
     public void delete(Integer id) {
         if (!stepRepository.existsById(id)) {
             throw new NotFoundException("Étape non trouvée");

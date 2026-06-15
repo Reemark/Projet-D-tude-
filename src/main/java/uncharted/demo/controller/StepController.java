@@ -31,6 +31,14 @@ public class StepController {
         return ResponseEntity.ok(stepService.create(request));
     }
 
+    @PutMapping("/{stepId}")
+    @PreAuthorize("hasAnyRole('PARTNER', 'ADMIN')")
+    public ResponseEntity<StepDto.Response> update(@PathVariable Integer huntId,
+                                                    @PathVariable Integer stepId,
+                                                    @Valid @RequestBody StepDto.UpdateRequest request) {
+        return ResponseEntity.ok(stepService.update(stepId, request));
+    }
+
     @DeleteMapping("/{stepId}")
     @PreAuthorize("hasAnyRole('PARTNER', 'ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Integer huntId, @PathVariable Integer stepId) {
