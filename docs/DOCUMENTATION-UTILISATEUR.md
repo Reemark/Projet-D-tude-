@@ -10,7 +10,7 @@ Lootopia est une plateforme de chasses au trésor numériques. Explorez des lieu
 
 ### Joueur
 
-1. Accédez à `http://localhost:5173`
+1. Accédez à `http://localhost` (Docker) ou `http://localhost:5173` (développement)
 2. Cliquez sur **Inscription** dans la barre de navigation
 3. Remplissez le formulaire :
    - **Pseudo** : votre nom d'affichage
@@ -47,6 +47,12 @@ Lootopia est une plateforme de chasses au trésor numériques. Explorez des lieu
    - Le créateur
 4. Cliquez sur une chasse pour voir les détails
 
+### Rechercher et filtrer
+
+- **Barre de recherche** : tapez un mot-clé pour filtrer les chasses par titre en temps réel
+- **Filtre difficulté** : sélectionnez Facile, Moyen ou Difficile pour n'afficher que les chasses correspondantes
+- Les deux filtres peuvent être combinés simultanément
+
 ### Détail d'une chasse
 
 Sur la page de détail, vous trouverez :
@@ -59,11 +65,21 @@ Sur la page de détail, vous trouverez :
 
 ## 4. Participer à une chasse
 
-### Rejoindre
+### Rejoindre une chasse publique
 
 1. Ouvrez le détail d'une chasse
 2. Cliquez sur **Rejoindre cette chasse**
 3. Vous êtes inscrit ! Vous pouvez maintenant creuser aux étapes
+
+### Rejoindre une chasse privée
+
+Certaines chasses sont protégées par un **code secret** (indiqué par une icône cadenas 🔒) :
+
+1. Ouvrez le détail d'une chasse privée
+2. Un champ **Code secret** apparaît avant le bouton Rejoindre
+3. Saisissez le code fourni par l'organisateur
+4. Cliquez sur **Rejoindre cette chasse**
+5. Si le code est incorrect, un message d'erreur s'affiche
 
 ### Creuser (valider une étape)
 
@@ -127,20 +143,34 @@ Si vous avez le rôle **PARTNER** :
    - **Titre** : nom de votre chasse
    - **Description** : contexte et objectif
    - **Difficulté** : Facile / Moyen / Difficile
+   - **Code secret** *(optionnel)* : laissez vide pour une chasse publique, ou saisissez un code pour la rendre privée
 3. Cliquez sur **Créer**
+
+### Modifier une chasse
+
+1. Dans **Mes chasses**, cliquez sur l'icône **crayon** ✏️ à côté de la chasse
+2. Modifiez les champs souhaités (titre, description, difficulté, code secret)
+3. Cliquez sur **✓** pour valider — les modifications sont appliquées immédiatement
 
 ### Ajouter des étapes
 
-Après avoir créé une chasse, ajoutez des étapes via l'API :
-- Chaque étape a des coordonnées GPS (latitude, longitude)
-- Un indice textuel
-- Un type de contenu AR (TEXT, IMAGE, VIDEO, OBJECT_3D)
-- Un nombre de points
+Après avoir créé une chasse, dépliez-la dans **Mes chasses** et utilisez le formulaire :
+- **Latitude / Longitude** : coordonnées GPS du point de passage
+- **Indice** : texte affiché au joueur
+- **Type AR** : TEXT, IMAGE, VIDEO ou OBJECT_3D (détermine le contenu en réalité augmentée)
+- **Points** : nombre de points attribués à la validation de cette étape
+- **URL modèle 3D** *(optionnel)* : lien vers un fichier `.glb` ou `.gltf` personnalisé
+
+### Modifier une étape
+
+1. Dans la liste des étapes d'une chasse, cliquez sur l'icône **crayon** ✏️ à côté de l'étape
+2. Modifiez les champs souhaités
+3. Cliquez sur **✓** pour valider
 
 ### Supprimer une chasse
 
 1. Dans **Mes chasses**, cliquez sur **Supprimer** à côté de la chasse
-2. La chasse et ses étapes sont supprimées
+2. La chasse, ses étapes et toutes les participations associées sont supprimées
 
 ---
 
@@ -148,6 +178,12 @@ Après avoir créé une chasse, ajoutez des étapes via l'API :
 
 ### Je ne peux pas créer de chasse
 → Vous devez avoir le rôle **PARTNER**. Inscrivez-vous en tant que partenaire avec votre SIRET.
+
+### Le code secret est refusé
+→ Vérifiez que vous copiez le code exact fourni par l'organisateur (sensible à la casse).
+
+### Je ne vois pas le bouton de modification
+→ Seul le créateur de la chasse (ou un administrateur) peut modifier ou supprimer une chasse.
 
 ### Mon token a expiré
 → Reconnectez-vous. Les tokens sont valides 24h.
@@ -168,11 +204,16 @@ Après avoir créé une chasse, ajoutez des étapes via l'API :
 | Action | Comment |
 |--------|---------|
 | Voir les chasses | Page d'accueil ou menu "Chasses" |
-| Rejoindre une chasse | Bouton sur la page de détail |
+| Rechercher une chasse | Barre de recherche sur la liste des chasses |
+| Filtrer par difficulté | Sélecteur sur la liste des chasses |
+| Rejoindre une chasse publique | Bouton "Rejoindre" sur la page de détail |
+| Rejoindre une chasse privée | Saisir le code secret puis bouton "Rejoindre" |
 | Creuser | Bouton "Creuser" à côté de chaque étape |
 | Voir la RA | Bouton "AR" à côté de chaque étape |
 | Classement | Menu "Classement" |
 | Mon profil | Cliquer sur son pseudo |
+| Mes chasses (partenaire) | Menu "Mes chasses" |
+| Modifier une chasse / étape | Icône crayon ✏️ dans "Mes chasses" |
 | Déconnexion | Bouton rouge "Déconnexion" |
 
 ---

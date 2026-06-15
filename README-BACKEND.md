@@ -140,9 +140,9 @@ src/main/java/uncharted/demo/
 │   └── ArContent.java                # Enum : TEXT, IMAGE, VIDEO, OBJECT_3D
 ├── dto/                              # Data Transfer Objects
 │   ├── AuthDto.java                  # RegisterRequest, RegisterPartnerRequest, LoginRequest, AuthResponse
-│   ├── HuntDto.java                  # CreateRequest, Response
-│   ├── StepDto.java                  # CreateRequest, Response
-│   ├── ParticipationDto.java         # Response
+│   ├── HuntDto.java                  # CreateRequest, UpdateRequest, Response
+│   ├── StepDto.java                  # CreateRequest, UpdateRequest, Response
+│   ├── ParticipationDto.java         # JoinRequest, Response
 │   ├── UserProgressDto.java          # Response
 │   ├── UserDto.java                  # Response (profil)
 │   └── LeaderboardDto.java           # Entry (classement)
@@ -190,8 +190,8 @@ src/main/java/uncharted/demo/
 | Rôle | Accès |
 |------|-------|
 | **USER** | Consulter les chasses, rejoindre, creuser, voir son profil |
-| **PARTNER** | Tout ce que USER peut faire + créer/supprimer des chasses et étapes |
-| **ADMIN** | Accès complet + gestion des utilisateurs + validation SIRET |
+| **PARTNER** | Tout ce que USER peut faire + créer/modifier/supprimer ses propres chasses et étapes |
+| **ADMIN** | Accès complet + modifier/supprimer toutes les chasses + gestion des utilisateurs + validation SIRET |
 
 ### Endpoints publics (sans token)
 
@@ -243,7 +243,8 @@ src/main/java/uncharted/demo/
 | GET | `/api/hunts` | Public | Lister les chasses actives |
 | GET | `/api/hunts/{id}` | Public | Détail d'une chasse |
 | POST | `/api/hunts` | PARTNER/ADMIN | Créer une chasse |
-| DELETE | `/api/hunts/{id}` | PARTNER/ADMIN | Supprimer une chasse |
+| PUT | `/api/hunts/{id}` | PARTNER/ADMIN | Modifier une chasse (owner ou admin) |
+| DELETE | `/api/hunts/{id}` | PARTNER/ADMIN | Supprimer une chasse (owner ou admin, cascade étapes/participations) |
 | GET | `/api/hunts/mine` | PARTNER/ADMIN | Mes chasses créées |
 
 ### Étapes
@@ -252,6 +253,7 @@ src/main/java/uncharted/demo/
 |---------|-----|-------|-------------|
 | GET | `/api/hunts/{huntId}/steps` | Public | Lister les étapes d'une chasse |
 | POST | `/api/hunts/{huntId}/steps` | PARTNER/ADMIN | Ajouter une étape |
+| PUT | `/api/hunts/{huntId}/steps/{stepId}` | PARTNER/ADMIN | Modifier une étape |
 | DELETE | `/api/hunts/{huntId}/steps/{stepId}` | PARTNER/ADMIN | Supprimer une étape |
 
 ### Participations
@@ -455,6 +457,7 @@ hunts
 ├── difficulty (EASY / MEDIUM / HARD)
 ├── creator_id (FK → users)
 ├── is_active
+├── secret_code (nullable — présent = chasse privée)
 └── created_at
 
 steps
@@ -465,6 +468,7 @@ steps
 ├── longitude
 ├── ar_content (TEXT / IMAGE / VIDEO / OBJECT_3D)
 ├── clue
+├── ar_model_url (nullable — URL GLTF pour OBJECT_3D)
 └── score
 
 participations
@@ -511,18 +515,19 @@ SELECT * FROM user_progress;
 
 ## Tests
 
-### Tests unitaires (10 tests)
+### Tests unitaires
 
 Testent la logique métier des services avec Mockito :
 - `AuthServiceTest` — inscription, login, email dupliqué
-- `HuntServiceTest` — création, suppression, accès non autorisé
-- `ParticipationServiceTest` — rejoindre, doublon, chasse inexistante
+- `HuntServiceTest` — création, modification, suppression, accès non autorisé
+- `ParticipationServiceTest` — rejoindre, code secret invalide, doublon, chasse inexistante
 
-### Tests d'intégration (7 tests)
+### Tests d'intégration
 
 Testent les endpoints HTTP avec MockMvc et H2 :
 - `AuthControllerIntegrationTest` — register, validation, login invalide
 - `HuntControllerIntegrationTest` — liste publique, 404, leaderboard
+- `PartnerFlowIntegrationTest` — flow complet partenaire, SIRET invalide, 403 USER
 
 ### Lancer les tests
 
@@ -576,8 +581,19 @@ Services démarrés :
 |---------|------|-------------|
 | backend | 8080 | API Spring Boot |
 | db | 3306 | MySQL 8 |
+| phpmyadmin | 8081 | Interface web MySQL (login : root / root) |
 | mailhog | 8025 | Interface mail (dev) |
 | mailhog | 1025 | SMTP (dev) |
+
+### Compte admin créé automatiquement
+
+Au premier démarrage, le `DataSeeder` crée un compte administrateur si aucun n'existe :
+
+| Champ | Valeur |
+|-------|--------|
+| Email | `admin@lootopia.com` |
+| Mot de passe | `Admin1234!` |
+| Rôle | `ADMIN` |
 
 ### Build de l'image seule
 

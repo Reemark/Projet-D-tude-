@@ -80,6 +80,8 @@ Lootopia est une plateforme de chasses au trésor numériques combinant géoloca
 | HTTP | Axios | Intercepteurs, gestion token |
 | Cartographie | Leaflet + React-Leaflet | Open source, léger, OpenStreetMap |
 | Réalité augmentée | A-Frame | WebXR, déclaratif, pas de plugin |
+| Icônes | Lucide React | Bibliothèque SVG cohérente, tree-shakable |
+| Animations | AOS (Animate On Scroll) | Apparition au scroll, configuration déclarative |
 
 ### Infrastructure
 
@@ -89,6 +91,7 @@ Lootopia est une plateforme de chasses au trésor numériques combinant géoloca
 | Conteneurisation | Docker + Docker Compose | Reproductibilité, isolation |
 | CI/CD | GitHub Actions | Intégré à GitHub, gratuit |
 | Mail (dev) | MailHog | Capture emails sans SMTP réel |
+| BDD (admin) | phpMyAdmin | Interface web pour administrer MySQL (port 8081) |
 
 ---
 
@@ -135,30 +138,33 @@ Client                    Backend                     BDD
 ## 6. Modèle de données (ERD)
 
 ```
-┌──────────┐       ┌──────────────┐       ┌──────────┐
-│  users   │1    N │participations│ N    1 │  hunts   │
-│──────────│───────│──────────────│───────│──────────│
-│ id (PK)  │       │ id (PK)      │       │ id (PK)  │
-│ email    │       │ user_id (FK) │       │ title    │
-│ password │       │ hunt_id (FK) │       │ creator_id│
-│ pseudo   │       │ status       │       │ difficulty│
-│ role     │       │ score        │       │ is_active│
-└──────────┘       └──────────────┘       └──────────┘
-      │1                                        │1
-      │                                         │
-      │N                                        │N
-┌──────────────┐                         ┌──────────┐
-│user_progress │                         │  steps   │
-│──────────────│                         │──────────│
-│ id (PK)      │                         │ id (PK)  │
-│ user_id (FK) │                         │ hunt_id  │
-│ hunt_id (FK) │                         │ step_order│
-│ step_id (FK) │                         │ latitude │
-│ is_completed │                         │ longitude│
-│ completed_at │                         │ ar_content│
-└──────────────┘                         │ clue     │
-                                         │ score    │
-                                         └──────────┘
+┌──────────┐       ┌──────────────┐       ┌──────────────┐
+│  users   │1    N │participations│ N    1 │    hunts     │
+│──────────│───────│──────────────│───────│──────────────│
+│ id (PK)  │       │ id (PK)      │       │ id (PK)      │
+│ email    │       │ user_id (FK) │       │ title        │
+│ password │       │ hunt_id (FK) │       │ creator_id   │
+│ pseudo   │       │ status       │       │ difficulty   │
+│ role     │       │ score        │       │ is_active    │
+└──────────┘       └──────────────┘       │ secret_code  │
+      │1                                  │ description  │
+      │                                   └──────────────┘
+      │N                                        │1
+┌──────────────┐                               │
+│user_progress │                               │N
+│──────────────│                         ┌──────────────┐
+│ id (PK)      │                         │    steps     │
+│ user_id (FK) │                         │──────────────│
+│ hunt_id (FK) │                         │ id (PK)      │
+│ step_id (FK) │                         │ hunt_id      │
+│ is_completed │                         │ step_order   │
+│ completed_at │                         │ latitude     │
+└──────────────┘                         │ longitude    │
+                                         │ ar_content   │
+                                         │ clue         │
+                                         │ score        │
+                                         │ ar_model_url │
+                                         └──────────────┘
 ```
 
 ---
@@ -174,6 +180,8 @@ Client                    Backend                     BDD
 - 3 rôles : USER, PARTNER, ADMIN
 - Contrôle au niveau endpoint (@PreAuthorize)
 - Endpoints publics explicitement déclarés
+- PARTNER et ADMIN peuvent créer, modifier et supprimer leurs chasses et étapes
+- ADMIN peut supprimer ou modifier n'importe quelle chasse (pas seulement les siennes)
 
 ### Bonnes pratiques appliquées
 - Pas de stockage de mot de passe en clair

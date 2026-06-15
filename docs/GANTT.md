@@ -24,7 +24,7 @@ SPRINT 1 - Fondations         |████████|████████
 ───────────────────────────────|────────|────────|────────|────────|────────|────────|────────|────────|
 SPRINT 2 - CRUD & Infra       |        |        |████████|████████|        |        |        |        |
   Docker Compose (MySQL)      |        |        |████    |        |        |        |        |        |
-  CRUD Chasses                |        |        |████████|        |        |        |        |        |
+  CRUD Chasses (+ update)     |        |        |████████|        |        |        |        |        |
   CRUD Étapes (géoloc)        |        |        |    ████|████    |        |        |        |        |
   Inscription partenaire      |        |        |        |████    |        |        |        |        |
   DTOs & validation           |        |        |        |████████|        |        |        |        |
@@ -39,9 +39,12 @@ SPRINT 3 - Gameplay & Qualité |        |        |        |        |████
 ───────────────────────────────|────────|────────|────────|────────|────────|────────|────────|────────|
 SPRINT 4 - Frontend & Polish  |        |        |        |        |        |        |████████|████████|
   Frontend React (pages)      |        |        |        |        |        |        |████████|        |
+  Thème UI (Cinzel, gold, AOS)|        |        |        |        |        |        |████████|        |
   Carte Leaflet               |        |        |        |        |        |        |████    |        |
   Réalité augmentée (A-Frame) |        |        |        |        |        |        |    ████|        |
   Leaderboard                 |        |        |        |        |        |        |    ████|        |
+  Edit chasses & étapes       |        |        |        |        |        |        |    ████|        |
+  Chasses privées (code secret)|       |        |        |        |        |        |    ████|        |
   Panel admin                 |        |        |        |        |        |        |        |████    |
   Tests (unitaires + intég)   |        |        |        |        |        |        |        |████    |
   Logging & Dockerfile        |        |        |        |        |        |        |        |████    |
@@ -76,7 +79,7 @@ FINALISATION                   |        |        |        |        |        |   
 | Tâche | Responsable | Durée | Livrable |
 |-------|-------------|-------|----------|
 | Docker Compose MySQL | DevOps | 1 jour | docker-compose.yml |
-| CRUD Chasses (create, list, delete) | Backend | 3 jours | Endpoints hunts |
+| CRUD Chasses (create, list, update, delete) | Backend | 3 jours | Endpoints hunts |
 | CRUD Étapes géolocalisées | Backend | 2 jours | Endpoints steps |
 | Inscription partenaire + SIRET | Backend | 1 jour | POST /auth/register/partner |
 | DTOs + validation | Backend | 2 jours | Requêtes validées |
@@ -106,11 +109,14 @@ FINALISATION                   |        |        |        |        |        |   
 | Tâche | Responsable | Durée | Livrable |
 |-------|-------------|-------|----------|
 | Pages React (login, register, hunts) | Frontend | 3 jours | SPA fonctionnelle |
+| Thème UI (Cinzel, or, AOS, Lucide, animations) | Frontend | 1 jour | Interface finale |
 | Carte Leaflet | Frontend | 1 jour | Composant HuntMap |
 | Réalité augmentée A-Frame | Frontend | 1 jour | Composant ArViewer |
 | Leaderboard (back + front) | Full Stack | 1 jour | Classement |
+| Edit chasses & étapes (PUT endpoints + UI) | Full Stack | 1 jour | Formulaires inline |
+| Chasses privées avec code secret | Full Stack | 1 jour | Secret code join |
 | Panel admin | Backend | 1 jour | Endpoints admin |
-| Tests unitaires + intégration | Backend | 1 jour | 17 tests |
+| Tests unitaires + intégration | Backend | 1 jour | Tests automatisés |
 | Logging + Dockerfile | DevOps | 1 jour | Logs + image Docker |
 
 **Livrable sprint :** MVP complet (front + back + devops)
