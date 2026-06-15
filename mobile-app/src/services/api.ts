@@ -26,7 +26,6 @@ api.interceptors.response.use(
     const status = error.response?.status;
     const url = error.config?.url;
     const data = error.response?.data;
-    console.error(`[API] ${url} → ${status ?? 'NETWORK ERROR'}`, JSON.stringify(data ?? error.message));
 
     if (status === 401) {
       await SecureStore.deleteItemAsync('token');

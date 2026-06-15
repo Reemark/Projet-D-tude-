@@ -52,6 +52,7 @@ export default function HuntMapScreen() {
           pathname: '/hunt/[id]/ar',
           params: {
             id,
+            stepId: String(msg.step.id),
             content: msg.step.arContent,
             clue: msg.step.clue,
             modelUrl: msg.step.modelUrl ?? '',

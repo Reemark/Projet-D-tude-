@@ -97,20 +97,6 @@ export default function HuntDetailScreen() {
     }
   };
 
-  const openAR = (step: Step) => {
-    router.push({
-      pathname: '/hunt/[id]/ar',
-      params: {
-        id,
-        stepId: step.id,
-        content: step.arContent,
-        clue: step.clue,
-        modelUrl: step.arModelUrl ?? '',
-        stepOrder: step.stepOrder,
-      },
-    } as any);
-  };
-
   const openMap = () => {
     router.push({
       pathname: '/hunt/[id]/map',
@@ -185,12 +171,14 @@ export default function HuntDetailScreen() {
         </View>
       )}
 
-      {/* Map button */}
-      <TouchableOpacity style={styles.mapBtn} onPress={openMap}>
-        <Ionicons name="map-outline" size={16} color="#b8860b" />
-        <Text style={styles.mapBtnText}>Voir la carte des étapes</Text>
-        <Ionicons name="chevron-forward" size={14} color="#9ca3af" />
-      </TouchableOpacity>
+      {/* Map button — visible seulement si inscrit */}
+      {joined && (
+        <TouchableOpacity style={styles.mapBtn} onPress={openMap}>
+          <Ionicons name="map-outline" size={16} color="#b8860b" />
+          <Text style={styles.mapBtnText}>Voir la carte des étapes</Text>
+          <Ionicons name="chevron-forward" size={14} color="#9ca3af" />
+        </TouchableOpacity>
+      )}
 
       {/* Join button */}
       {isAuthenticated && !joined && (
@@ -223,9 +211,6 @@ export default function HuntDetailScreen() {
               </View>
             </View>
             <View style={styles.stepActions}>
-              <TouchableOpacity style={styles.arBtn} onPress={() => openAR(step)}>
-                <Text style={styles.arBtnText}>AR</Text>
-              </TouchableOpacity>
               {isAuthenticated && joined && !done && (
                 <TouchableOpacity style={styles.digBtn} onPress={() => handleDig(step.id)}>
                   <Ionicons name="hammer-outline" size={13} color="#b8860b" />
@@ -348,11 +333,6 @@ const styles = StyleSheet.create({
   stepClue: { fontSize: 12, color: '#6b7280', marginTop: 2 },
   stepMeta: { fontSize: 11, color: '#9ca3af', marginTop: 4 },
   stepActions: { flexDirection: 'row', gap: 8, alignItems: 'center', marginLeft: 10 },
-  arBtn: {
-    backgroundColor: '#f8fafc', borderWidth: 1, borderColor: '#e5e7eb',
-    borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6,
-  },
-  arBtnText: { fontSize: 12, fontWeight: '600', color: '#b8860b' },
   digBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
     backgroundColor: '#fef9ee', borderWidth: 1, borderColor: '#fde68a',
