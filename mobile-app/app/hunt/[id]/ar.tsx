@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AFrameViewer from '@/components/AFrameViewer';
@@ -10,6 +11,7 @@ import type { ArContent } from '@/types';
 type Mode = 'ar' | 'vr';
 
 export default function ArViewerScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const [mode, setMode] = useState<Mode>('ar');
   const [validating, setValidating] = useState(false);
@@ -47,7 +49,7 @@ export default function ArViewerScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={20} color="#1c1a16" />
         </TouchableOpacity>
