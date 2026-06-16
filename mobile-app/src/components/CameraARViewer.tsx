@@ -1,42 +1,45 @@
-import { useRef, useCallback } from 'react';
-import {
-  View, Text, StyleSheet, PanResponder, ActivityIndicator,
-} from 'react-native';
+import { useEffect, useRef, useCallback } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { GLView, ExpoWebGLRenderingContext } from 'expo-gl';
+import { DeviceMotion } from 'expo-sensors';
 import * as THREE from 'three';
 
 interface Props {
   modelLabel?: string;
 }
 
-// Spherical orbit state (mutable ref — no re-render on change)
-interface Orbit { theta: number; phi: number; radius: number }
+const CORRECTION = new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
+const OBJECT_Z = -5;
 
 export default function CameraARViewer({ modelLabel = 'Objet 3D' }: Props) {
   const [permission, requestPermission] = useCameraPermissions();
-  const orbit = useRef<Orbit>({ theta: 0.4, phi: 1.1, radius: 3.5 });
-  const lastPos = useRef({ x: 0, y: 0 });
+  const deviceQuat = useRef(new THREE.Quaternion());
+  const baseQuat   = useRef<THREE.Quaternion | null>(null);
 
-  // ── Orbit touch controls ──────────────────────────────────────────────────
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: (e) => {
-        lastPos.current = { x: e.nativeEvent.locationX, y: e.nativeEvent.locationY };
-      },
-      onPanResponderMove: (e) => {
-        const dx = e.nativeEvent.locationX - lastPos.current.x;
-        const dy = e.nativeEvent.locationY - lastPos.current.y;
-        orbit.current.theta -= dx * 0.012;
-        orbit.current.phi = Math.max(0.15, Math.min(Math.PI - 0.15, orbit.current.phi + dy * 0.012));
-        lastPos.current = { x: e.nativeEvent.locationX, y: e.nativeEvent.locationY };
-      },
-    })
-  ).current;
+  useEffect(() => {
+    DeviceMotion.setUpdateInterval(33);
 
-  // ── Three.js scene ────────────────────────────────────────────────────────
+    const _euler = new THREE.Euler();
+    const _q     = new THREE.Quaternion();
+
+    const sub = DeviceMotion.addListener(({ rotation }) => {
+      if (!rotation) return;
+      const alpha = rotation.alpha ?? 0;
+      const beta  = rotation.beta  ?? 0;
+      const gamma = rotation.gamma ?? 0;
+
+      _euler.set(beta, alpha, -gamma, 'YXZ');
+      _q.setFromEuler(_euler).multiply(CORRECTION);
+      deviceQuat.current.copy(_q);
+
+      if (!baseQuat.current) {
+        baseQuat.current = _q.clone();
+      }
+    });
+    return () => sub.remove();
+  }, []);
+
   const onContextCreate = useCallback(async (gl: ExpoWebGLRenderingContext) => {
     const renderer = new THREE.WebGLRenderer({
       canvas: {
@@ -52,74 +55,69 @@ export default function CameraARViewer({ modelLabel = 'Objet 3D' }: Props) {
       alpha: true,
       antialias: true,
     });
-
     renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
     renderer.setPixelRatio(1);
-    renderer.setClearColor(0x000000, 0); // transparent — shows camera behind
+    renderer.setClearColor(0x000000, 0);
 
-    const scene = new THREE.Scene();
+    const scene  = new THREE.Scene();
     const aspect = gl.drawingBufferWidth / gl.drawingBufferHeight;
-    const camera = new THREE.PerspectiveCamera(65, aspect, 0.1, 1000);
 
-    // ── Coffre au trésor ──
-    const gold = new THREE.MeshStandardMaterial({ color: 0xb8860b, metalness: 0.65, roughness: 0.28 });
-    const darkGold = new THREE.MeshStandardMaterial({ color: 0x7a5500, metalness: 0.4, roughness: 0.5 });
+    const camera = new THREE.PerspectiveCamera(60, aspect, 0.1, 100);
+    camera.position.set(0, 0, 0);
 
-    // Corps
+    // ── Coffre au trésor ──────────────────────────────────────────────────────
+    const group = new THREE.Group();
+    group.position.set(0, -0.5, OBJECT_Z);
+    group.scale.setScalar(0.45);
+
+    const gold     = new THREE.MeshStandardMaterial({ color: 0xb8860b, metalness: 0.65, roughness: 0.28 });
+    const darkGold = new THREE.MeshStandardMaterial({ color: 0x7a5500, metalness: 0.4,  roughness: 0.5 });
+
     const body = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.9, 1.0), gold);
-    body.position.y = 0;
-    scene.add(body);
+    group.add(body);
 
-    // Couvercle
     const lid = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.45, 1.0), gold);
     lid.position.y = 0.675;
-    scene.add(lid);
+    group.add(lid);
 
-    // Cerclages métal
-    const bandMat = darkGold;
     const bandGeo = new THREE.BoxGeometry(1.42, 0.08, 1.02);
     [-0.3, 0, 0.3].forEach((y) => {
-      const band = new THREE.Mesh(bandGeo, bandMat);
+      const band = new THREE.Mesh(bandGeo, darkGold);
       band.position.y = y;
-      scene.add(band);
+      group.add(band);
     });
 
-    // Serrure
     const lock = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.18, 0.06), darkGold);
     lock.position.set(0, 0.3, 0.53);
-    scene.add(lock);
+    group.add(lock);
 
-    // Sol (ombre subtile)
-    const floor = new THREE.Mesh(
-      new THREE.PlaneGeometry(6, 6),
-      new THREE.MeshStandardMaterial({ color: 0x888888, opacity: 0.12, transparent: true })
-    );
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -0.45;
-    scene.add(floor);
+    scene.add(group);
 
-    // Lumières
-    scene.add(new THREE.AmbientLight(0xffffff, 0.75));
-    const sun = new THREE.DirectionalLight(0xfff4cc, 1.1);
+    // ── Lumières ──────────────────────────────────────────────────────────────
+    scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+    const sun = new THREE.DirectionalLight(0xfff4cc, 1.2);
     sun.position.set(3, 5, 2);
     scene.add(sun);
     const fill = new THREE.PointLight(0xa78bfa, 0.5);
     fill.position.set(-3, 2, -2);
     scene.add(fill);
 
-    const target = new THREE.Vector3(0, 0.2, 0);
+    // ── Pré-alloué pour la boucle animate ────────────────────────────────────
+    const _baseInv = new THREE.Quaternion();
+    const _rel     = new THREE.Quaternion();
+    let t = 0;
 
-    // ── Animation loop ──
     const animate = () => {
       requestAnimationFrame(animate);
+      t += 0.02;
 
-      const { theta, phi, radius } = orbit.current;
-      camera.position.set(
-        radius * Math.sin(phi) * Math.cos(theta),
-        radius * Math.cos(phi) + 0.3,
-        radius * Math.sin(phi) * Math.sin(theta)
-      );
-      camera.lookAt(target);
+      if (baseQuat.current) {
+        _baseInv.copy(baseQuat.current).invert();
+        _rel.copy(deviceQuat.current).multiply(_baseInv);
+        camera.quaternion.copy(_rel);
+      }
+
+      group.position.y = -0.5 + Math.sin(t) * 0.04;
 
       renderer.render(scene, camera);
       gl.endFrameEXP();
@@ -127,7 +125,6 @@ export default function CameraARViewer({ modelLabel = 'Objet 3D' }: Props) {
     animate();
   }, []);
 
-  // ── Permission UI ─────────────────────────────────────────────────────────
   if (!permission) {
     return (
       <View style={styles.center}>
@@ -146,21 +143,16 @@ export default function CameraARViewer({ modelLabel = 'Objet 3D' }: Props) {
   }
 
   return (
-    <View style={styles.container} {...panResponder.panHandlers}>
-      {/* Camera background */}
+    <View style={styles.container}>
       <CameraView style={StyleSheet.absoluteFill} facing="back" />
-
-      {/* Three.js transparent overlay — pointerEvents none so pan goes to parent */}
-      <GLView style={StyleSheet.absoluteFill} onContextCreate={onContextCreate} pointerEvents="none" />
-
-      {/* HUD */}
+      <GLView style={StyleSheet.absoluteFill} onContextCreate={onContextCreate} />
       <View style={styles.hud}>
         <View style={styles.hudBadge}>
           <Text style={styles.hudText}>📷 AR · {modelLabel}</Text>
         </View>
       </View>
       <View style={styles.hint}>
-        <Text style={styles.hintText}>Glissez pour orbiter autour de l'objet</Text>
+        <Text style={styles.hintText}>Pointez vers l'avant — l'objet sort de l'écran si vous regardez ailleurs</Text>
       </View>
     </View>
   );
@@ -168,10 +160,14 @@ export default function CameraARViewer({ modelLabel = 'Objet 3D' }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1c1a16', gap: 16 },
+  center: {
+    flex: 1, justifyContent: 'center', alignItems: 'center',
+    backgroundColor: '#1c1a16', gap: 16,
+  },
   permText: { color: '#d4a017', fontSize: 16, fontWeight: '600' },
   permBtn: {
-    color: '#fff', backgroundColor: '#b8860b', paddingHorizontal: 24, paddingVertical: 12,
+    color: '#fff', backgroundColor: '#b8860b',
+    paddingHorizontal: 24, paddingVertical: 12,
     borderRadius: 12, fontWeight: '700', overflow: 'hidden',
   },
   hud: { position: 'absolute', top: 16, left: 16, right: 16, alignItems: 'flex-start' },
@@ -180,11 +176,10 @@ const styles = StyleSheet.create({
     borderRadius: 20, borderWidth: 1, borderColor: 'rgba(184,134,11,0.6)',
   },
   hudText: { color: '#fde68a', fontSize: 13, fontWeight: '700' },
-  hint: {
-    position: 'absolute', bottom: 24, left: 0, right: 0, alignItems: 'center',
-  },
+  hint: { position: 'absolute', bottom: 24, left: 0, right: 0, alignItems: 'center' },
   hintText: {
     color: 'rgba(255,255,255,0.75)', fontSize: 12,
-    backgroundColor: 'rgba(0,0,0,0.45)', paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.45)', paddingHorizontal: 14, paddingVertical: 6,
+    borderRadius: 20, textAlign: 'center',
   },
 });

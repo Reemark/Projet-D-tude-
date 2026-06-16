@@ -111,6 +111,13 @@ Les étapes doivent être complétées **dans l'ordre**. Vous ne pouvez pas vali
    - Un texte (si type TEXT)
 3. Autorisez l'accès à la caméra si demandé
 
+**Sur mobile (Expo Go)**, la vue AR utilise le mode **caméra hybride** :
+- Le flux caméra réel s'affiche en arrière-plan
+- Un objet 3D est superposé et ancré dans l'espace
+- Bougez le téléphone à gauche/droite pour voir l'objet sous différents angles
+- Si vous regardez ailleurs, l'objet sort de l'écran (comportement AR réaliste)
+- Vous pouvez basculer en mode **VR 360°** via le sélecteur AR / VR en haut à droite
+
 ---
 
 ## 5. Carte interactive
@@ -252,6 +259,7 @@ L'application mobile Lootopia est disponible via **Expo Go** (iOS & Android).
 - Suivre sa progression en temps réel
 - Consulter le classement mondial
 - Gérer son profil et se déconnecter
+- Vue AR hybride avec caméra réelle + objet 3D superposé (gyroscope requis)
 
 ### Prérequis
 

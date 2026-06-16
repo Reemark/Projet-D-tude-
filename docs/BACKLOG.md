@@ -86,6 +86,7 @@
 |----|-----------|----------|--------|--------|
 | US-23 | En tant que joueur, je veux voir un contenu AR (3D, image, texte) à chaque étape | P0 | ✅ | 4 |
 | US-24 | En tant que partenaire, je veux choisir le type de contenu AR pour chaque étape | P1 | ✅ | 4 |
+| US-38 | En tant que joueur mobile, je veux une vue AR hybride (caméra réelle + objet 3D) piloté par le gyroscope pour que l'objet soit ancré dans l'espace | P1 | ✅ | 4 |
 
 ---
 
