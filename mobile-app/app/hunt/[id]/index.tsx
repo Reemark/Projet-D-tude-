@@ -286,7 +286,6 @@ const styles = StyleSheet.create({
   msgText: { fontSize: 13, color: '#065f46' },
   msgTextGold: { color: '#92400e' },
   finishedBanner: {
-    backgroundColor: 'linear-gradient(to right, #fffbeb, #fef3c7)',
     backgroundColor: '#fffbeb',
     borderRadius: 16, padding: 20, alignItems: 'center',
     borderWidth: 1, borderColor: '#fde68a', marginBottom: 16,
