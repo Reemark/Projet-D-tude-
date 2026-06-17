@@ -1,12 +1,14 @@
 package uncharted.demo.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uncharted.demo.dto.StepDto;
 import uncharted.demo.exception.NotFoundException;
 import uncharted.demo.model.Hunt;
 import uncharted.demo.model.Step;
 import uncharted.demo.repository.HuntRepository;
 import uncharted.demo.repository.StepRepository;
+import uncharted.demo.repository.UserProgressRepository;
 
 import java.util.List;
 
@@ -15,10 +17,12 @@ public class StepService {
 
     private final StepRepository stepRepository;
     private final HuntRepository huntRepository;
+    private final UserProgressRepository userProgressRepository;
 
-    public StepService(StepRepository stepRepository, HuntRepository huntRepository) {
+    public StepService(StepRepository stepRepository, HuntRepository huntRepository, UserProgressRepository userProgressRepository) {
         this.stepRepository = stepRepository;
         this.huntRepository = huntRepository;
+        this.userProgressRepository = userProgressRepository;
     }
 
     public StepDto.Response create(StepDto.CreateRequest request) {
@@ -56,10 +60,12 @@ public class StepService {
         return toResponse(stepRepository.save(step));
     }
 
+    @Transactional
     public void delete(Integer id) {
         if (!stepRepository.existsById(id)) {
             throw new NotFoundException("Étape non trouvée");
         }
+        userProgressRepository.deleteAll(userProgressRepository.findByStepId(id));
         stepRepository.deleteById(id);
     }
 
