@@ -12,6 +12,7 @@ import uncharted.demo.model.Hunt;
 import uncharted.demo.model.Step;
 import uncharted.demo.repository.HuntRepository;
 import uncharted.demo.repository.StepRepository;
+import uncharted.demo.repository.UserProgressRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +28,8 @@ class StepServiceTest {
     private StepRepository stepRepository;
     @Mock
     private HuntRepository huntRepository;
+    @Mock
+    private UserProgressRepository userProgressRepository;
 
     @InjectMocks
     private StepService stepService;
@@ -115,7 +118,9 @@ class StepServiceTest {
     @Test
     void delete_shouldSucceed_whenStepExists() {
         when(stepRepository.existsById(1)).thenReturn(true);
+        when(userProgressRepository.findByStepId(1)).thenReturn(List.of());
         stepService.delete(1);
+        verify(userProgressRepository).deleteAll(List.of());
         verify(stepRepository).deleteById(1);
     }
 }
