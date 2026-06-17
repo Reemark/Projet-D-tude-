@@ -68,7 +68,8 @@ export default function HuntMapScreen() {
   // ── HTML Leaflet ───────────────────────────────────────────────────────────
   const buildHtml = useCallback(() => {
     const completedIds = progress.filter((p) => p.completed).map((p) => p.stepId);
-    const nextStep = steps.find((s) => !completedIds.includes(s.id));
+    const sorted = [...steps].sort((a, b) => a.stepOrder - b.stepOrder);
+    const nextStep = sorted.find((s) => !completedIds.includes(s.id));
 
     const enriched = steps.map((step) => {
       const done = completedIds.includes(step.id);
@@ -222,7 +223,10 @@ if (user) {
   bounds.push([user.lat, user.lng]);
 }
 
-if (bounds.length > 0) {
+var focusStep = steps.find(function(s){ return s.isNext; });
+if (focusStep) {
+  map.setView([focusStep.lat, focusStep.lng], 16);
+} else if (bounds.length > 0) {
   map.fitBounds(bounds, { padding:[56,56], maxZoom:17 });
 } else {
   map.setView([${centerLat}, ${centerLng}], 14);

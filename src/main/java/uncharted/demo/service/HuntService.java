@@ -1,6 +1,7 @@
 package uncharted.demo.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uncharted.demo.dto.HuntDto;
 import uncharted.demo.exception.ForbiddenException;
 import uncharted.demo.exception.NotFoundException;
@@ -88,6 +89,7 @@ public class HuntService {
         return huntRepository.findByCreator(creator).stream().map(this::toResponse).toList();
     }
 
+    @Transactional
     public void delete(Integer id, String email) {
         Hunt hunt = huntRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Chasse non trouvée"));
