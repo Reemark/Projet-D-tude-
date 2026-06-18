@@ -140,7 +140,9 @@ FINALISATION                   |        |        |        |        |        |   
 
 | Membre | Rôle | Responsabilités |
 |--------|------|-----------------|
-| Étudiant 1 | Backend & API | API REST, auth, services, tests |
-| Étudiant 2 | Frontend & UX | React, Leaflet, A-Frame, responsive |
-| Étudiant 3 | DevOps & Qualité | Docker, CI/CD, monitoring, documentation |
-| Étudiant 4 (opt.) | Product Owner | Backlog, coordination, vidéo démo |
+| Adam | Backend & API | API REST, auth, services, tests |
+| Mehdi | Frontend & UX | React, Leaflet, A-Frame, responsive |
+| Lucas | DevOps & Qualité | Docker, CI/CD, monitoring, documentation |
+| Lesly  | Product Owner | Backlog, coordination, vidéo démo |
+
+La répartition est générale car nous avons tous les 4 touchés a tout les secteurs à un moment donné.
